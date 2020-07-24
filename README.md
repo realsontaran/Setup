@@ -1,23 +1,31 @@
 # My Linux Setup
 
-## ScreenShot
-
 ![All](Screenshots/All.png)
 
-**Distro:** [Arch Linux](https://www.archlinux.org/) A simple, lightweight distribution
+## **Distro:** [Arch Linux](https://www.archlinux.org/) A simple, lightweight distribution
 
-![neofetch](Screenshots/distro.png)
+## ![neofetch](Screenshots/distro.png)
 
-**Desktop Environment:** None
+## **Desktop Environment**
+ None
 
-**Window Manager:** [DWM - Dynamic Window Manager](https://dwm.suckless.org/)
+## **Window Manager**
+ [DWM - Dynamic Window Manager](https://dwm.suckless.org/)
 
-**Terminal:** [Suckles Simple Terminal](https://st.suckless.org/) easy to configure and customize.
+## **DWM Bar** 
+This repo includes my [dwm-bar](https://github.com/realsontaran/Setup/tree/master/dwm-bar) scripts. Real [owner](https://github.com/joestandring/dwm-bar) of the scripts . You can add and remove all modules to bar as you wish.
+
+## **Terminal**
+ [Suckles Simple Terminal](https://st.suckless.org/) easy to configure and customize.
+## **Shell**
+ [Fish shell](https://fishshell.com/) with [Oh my fish](https://github.com/oh-my-fish/oh-my-fish) [Batman Theme](https://github.com/oh-my-fish/theme-batman).
 ![st](Screenshots/st.png)
 
-**Wallpaper:** ![WP](Screenshots/WP.png)
 
-**Color Scheme:** [Dracula Color Scheme](https://github.com/dracula/dracula-theme) very easy on the eye.
+## **Wallpaper:** ![WP](Screenshots/WP.png)
+
+## **Color Scheme:** 
+[Dracula Color Scheme](https://github.com/dracula/dracula-theme) very easy on the eye.
 
 
 Palette      | Hex       | ![Color Picker Boxes](https://draculatheme.com/static/img/color-boxes/eyedropper.png)
