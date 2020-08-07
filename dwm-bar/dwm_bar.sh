@@ -42,10 +42,11 @@ export SEP2=" | "
 . "$DIR/bar-functions/dwm_date.sh"
 . "$DIR/bar-functions/dwm_connman.sh"
 . "$DIR/bar-functions/dwm_loadavg.sh"
+. "$DIR/bar-functions/dwm_layout.sh"
 
 # Update dwm status bar every second
 while true
 do
-    xsetroot -name "$(dwm_resources)$(dwm_pulse)$(dwm_backlight)$(dwm_battery)$(dwm_weather)$(dwm_date)"
+  xsetroot -name "$(dwm_spotify) $(dwm_layout)$(dwm_resources)$(dwm_pulse)$(dwm_backlight)$(dwm_battery)$(dwm_networkmanager)$(dwm_date)"
     sleep 1
 done

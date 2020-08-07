@@ -3,7 +3,27 @@
 dwm \- dynamic window manager
 .SH SYNOPSIS
 .B dwm
-.RB [ \-v ]
+.RB [ \-vh ]
+.RB [ \-fn
+.IR font ]
+.RB [ \-nb
+.IR color ]
+.RB [ \-nf
+.IR color ]
+.RB [ \-sb
+.IR color ]
+.RB [ \-sf
+.IR color ]
+.RB [ \-df
+.IR font ]
+.RB [ \-dnb
+.IR color ]
+.RB [ \-dnf
+.IR color ]
+.RB [ \-dsb
+.IR color ]
+.RB [ \-dsf
+.IR color ]
 .SH DESCRIPTION
 dwm is a dynamic window manager for X. It manages windows in tiled, monocle
 and floating layouts. Either layout can be applied dynamically, optimising the
@@ -34,6 +54,43 @@ dwm draws a small border around windows to indicate the focus state.
 .TP
 .B \-v
 prints version information to standard output, then exits.
+.TP
+.B \-h --help
+prints short help
+.TP
+.BI \-fn " font"
+defines the font or font set used.
+.TP
+.BI \-nb " color"
+defines the normal background color.
+.IR #RGB ,
+.IR #RRGGBB ,
+and X color names are supported.
+.TP
+.BI \-nf " color"
+defines the normal foreground color.
+.TP
+.BI \-sb " color"
+defines the selected background color.
+.TP
+.BI \-sf " color"
+defines the selected foreground color.
+.TP
+.BI \-df " font"
+defines the font used in dmenu_run.
+.TP
+.BI \-dnb " color"
+defines the normal background color in dmenu_run.
+.TP
+.BI \-dnf " color"
+defines the normal foreground color in dmenu_run.
+.TP
+.BI \-dsb " color"
+defines the selected background color in dmenu_run.
+.TP
+.BI \-dsf " color"
+defines the selected foreground color in dmenu_run.
+.TP
 .SH USAGE
 .SS Status bar
 .TP
