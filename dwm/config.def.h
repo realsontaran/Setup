@@ -17,30 +17,27 @@ static const char fgnorm[] = "#f1fa8c";
 static const char fgsel[] = "#282a36";
 static const char selhidfgbdborder[] = "#50fa7b";
 static char selbordercolor[] = "#ff5555";
+
 static const char *colors[][3] = {
     /*               fg         bg         border   */
     [SchemeNorm] = {fgnorm, bgselhid, border},
     [SchemeSel] = {fgsel, selhidfgbdborder, selbordercolor},
     [SchemeHid] = {selhidfgbdborder, bgselhid, selhidfgbdborder},
-    [SchemeStatus] = {fgnorm, bgselhid,
-                      "#000000"}, // Statusbar right {text,background,not used
-                                  // but cannot be empty}
 
-    [SchemeTagsSel] = {fgsel, selhidfgbdborder,
+    [SchemeStatus] = {"#50fa7b", "#44475a",
+                      "#000000"}, // Statusbar right {text,background,not used
+    [SchemeTagsSel] = {"#282a36", "#ff5555",
                        "#000000"}, // Tagbar left selected {text,background,not
-                                   // used but cannot be empty}
     [SchemeTagsNorm] =
-        {fgnorm, bgselhid,
+        {fgnorm, "#44475a",
          "#000000"}, // Tagbar left unselected {text,background,not used but
-                     // cannot be empty}
     [SchemeInfoSel] =
         {fgsel, selhidfgbdborder,
          "#000000"}, // infobar middle  selected {text,background,not used but
-                     // cannot be empty}
     [SchemeInfoNorm] =
         {fgnorm, bgselhid,
          "#000000"}, // infobar middle  unselected {text,background,not used but
-                     // cannot be empty}
+
 };
 
 /* tagging */
@@ -91,7 +88,7 @@ static const char *dmenucmd[] = {"dmenu_run", "-m",  dmenumon,         "-fn",
                                  dmenufont,   "-nb", bgselhid,         "-nf",
                                  fgnorm,      "-sb", selhidfgbdborder, "-sf",
                                  fgsel,       NULL};
-static const char *termcmd[] = {"alacritty", NULL};
+static const char *termcmd[] = {"st", NULL};
 
 #include "mpdcontrol.c"
 
@@ -127,17 +124,14 @@ static Key keys[] = {
     {MODKEY, XK_minus, setgaps, {.i = -1}},
     {MODKEY, XK_equal, setgaps, {.i = +1}},
     {MODKEY | ShiftMask, XK_equal, setgaps, {.i = 0}},
-    {MODKEY, XK_r, spawn, SHCMD("nautilus")},
-    {MODKEY, XK_h, spawn, SHCMD("alacritty -e htop")},
-    {MODKEY | ShiftMask, XK_b, spawn, SHCMD("alacritty -e bluetoothctl")},
+    {MODKEY, XK_r, spawn, SHCMD("thunar")},
+    {MODKEY, XK_h, spawn, SHCMD("st -e htop")},
+    {MODKEY | ShiftMask, XK_b, spawn, SHCMD("st -e bluetoothctl")},
     {MODKEY, XK_w, spawn, SHCMD("brave")},
     {MODKEY | ShiftMask, XK_q, quit, {0}},
     {MODKEY, XK_x, setgaps, {.i = +3}},
     {MODKEY, XK_z, setgaps, {.i = -3}},
     {MODKEY, XK_a, setgaps, {.i = 0}},
-
-    {MODKEY | ShiftMask, XK_e, spawn,
-     SHCMD("alacritty -e vim .config/alacritty/alacritty.yml")},
     {MODKEY, XK_e, spawn, SHCMD("emacs")},
     TAGKEYS(XK_1, 0) TAGKEYS(XK_2, 1) TAGKEYS(XK_3, 2) TAGKEYS(XK_4, 3)
         TAGKEYS(XK_5, 4) TAGKEYS(XK_6, 5) TAGKEYS(XK_7, 6) TAGKEYS(XK_8, 7)

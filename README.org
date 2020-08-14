@@ -1,0 +1,80 @@
+* My Linux Setup
+  :PROPERTIES:
+  :CUSTOM_ID: my-linux-setup
+  :END:
+
+#+CAPTION: All
+[[file:Screenshots/All.png]]
+
+** *Distro:* [[https://www.archlinux.org/][Arch Linux]] A simple, lightweight distribution
+   :PROPERTIES:
+   :CUSTOM_ID: distro-arch-linux-a-simple-lightweight-distribution
+   :END:
+
+** [[file:Screenshots/distro.png]]
+   :PROPERTIES:
+   :CUSTOM_ID: neofetch
+   :END:
+
+** *Desktop Environment*
+   :PROPERTIES:
+   :CUSTOM_ID: desktop-environment
+   :END:
+
+None
+
+** *Window Manager*
+   :PROPERTIES:
+   :CUSTOM_ID: window-manager
+   :END:
+
+[[https://dwm.suckless.org/][DWM - Dynamic Window Manager]]
+
+** *DWM Bar*
+   :PROPERTIES:
+   :CUSTOM_ID: dwm-bar
+   :END:
+
+This repo includes my
+[[https://github.com/realsontaran/Setup/tree/master/dwm-bar][dwm-bar]]
+scripts. Real [[https://github.com/joestandring/dwm-bar][owner]] of the
+scripts . You can add and remove all modules to bar as you wish.
+
+** *Terminal*
+   :PROPERTIES:
+   :CUSTOM_ID: terminal
+   :END:
+
+[[https://st.suckless.org/][Suckles Simple Terminal]] easy to configure
+and customize. ## *Shell* [[https://fishshell.com/][Fish shell]] with
+[[https://github.com/oh-my-fish/oh-my-fish][Oh my fish]]
+[[https://github.com/oh-my-fish/theme-batman][Batman Theme]].
+[[file:Screenshots/st.png]]
+
+** *Wallpaper:* [[file:Screenshots/WP.png]]
+   :PROPERTIES:
+   :CUSTOM_ID: wallpaper-wp
+   :END:
+
+** *Color Scheme:*
+   :PROPERTIES:
+   :CUSTOM_ID: color-scheme
+   :END:
+
+[[https://github.com/dracula/dracula-theme][Dracula Color Scheme]] very
+easy on the eye.
+
+| Palette      | Hex       | [[https://draculatheme.com/static/img/color-boxes/eyedropper.png]]   |
+|--------------+-----------+----------------------------------------------------------------------|
+| Background   | =#282a36= | [[https://draculatheme.com/static/img/color-boxes/background.png]]   |
+| Current Line | =#44475a= | [[https://draculatheme.com/static/img/color-boxes/current_line.png]] |
+| Selection    | =#44475a= | [[https://draculatheme.com/static/img/color-boxes/selection.png]]    |
+| Foreground   | =#f8f8f2= | [[https://draculatheme.com/static/img/color-boxes/foreground.png]]   |
+| Comment      | =#6272a4= | [[https://draculatheme.com/static/img/color-boxes/comment.png]]      |
+| Cyan         | =#8be9fd= | [[https://draculatheme.com/static/img/color-boxes/cyan.png]]         |
+| Green        | =#50fa7b= | [[https://draculatheme.com/static/img/color-boxes/green.png]]        |
+| Orange       | =#ffb86c= | [[https://draculatheme.com/static/img/color-boxes/orange.png]]       |
+| Pink         | =#ff79c6= | [[https://draculatheme.com/static/img/color-boxes/pink.png]]         |
+| Purple       | =#bd93f9= | [[https://draculatheme.com/static/img/color-boxes/purple.png]]       |
+| Red          | =#ff5555= | [[https://draculatheme.com/static/img/color-boxes/red.png]]          |
+| Yellow       | =#f1fa8c= | [[https://draculatheme.com/static/img/color-boxes/yellow.png]]       |
