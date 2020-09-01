@@ -4,8 +4,12 @@
 static const unsigned int borderpx = 2; /* border pixel of windows */
 static const unsigned int gappx = 5;    /* gaps between windows */
 static const unsigned int snap = 32;    /* snap pixel */
-static const int showbar = 1;           /* 0 means no bar */
-static const int topbar = 1;            /* 0 means bottom bar */
+static const unsigned int minwsz =
+    20;                           /* Minimal heigt of a client for smfact */
+static const int showbar = 1;     /* 0 means no bar */
+static const int topbar = 1;      /* 0 means bottom bar */
+static const int horizpadbar = 0; /* horizontal padding for statusbar */
+static const int vertpadbar = 0;  /* vertical padding for statusbar */
 static const char *fonts[] = {
     "Mononoki Nerd Font:size=11:antialias=true:autohint=true",
     "Hack:size=8:antialias=true:autohint=true",
@@ -17,30 +21,27 @@ static const char fgnorm[] = "#f1fa8c";
 static const char fgsel[] = "#282a36";
 static const char selhidfgbdborder[] = "#50fa7b";
 static char selbordercolor[] = "#ff5555";
+
 static const char *colors[][3] = {
     /*               fg         bg         border   */
     [SchemeNorm] = {fgnorm, bgselhid, border},
     [SchemeSel] = {fgsel, selhidfgbdborder, selbordercolor},
     [SchemeHid] = {selhidfgbdborder, bgselhid, selhidfgbdborder},
-    [SchemeStatus] = {fgnorm, bgselhid,
-                      "#000000"}, // Statusbar right {text,background,not used
-                                  // but cannot be empty}
 
-    [SchemeTagsSel] = {fgsel, selhidfgbdborder,
+    [SchemeStatus] = {"#50fa7b", "#44475a",
+                      "#000000"}, // Statusbar right {text,background,not used
+    [SchemeTagsSel] = {"#282a36", "#ff5555",
                        "#000000"}, // Tagbar left selected {text,background,not
-                                   // used but cannot be empty}
     [SchemeTagsNorm] =
-        {fgnorm, bgselhid,
+        {fgnorm, "#44475a",
          "#000000"}, // Tagbar left unselected {text,background,not used but
-                     // cannot be empty}
     [SchemeInfoSel] =
         {fgsel, selhidfgbdborder,
          "#000000"}, // infobar middle  selected {text,background,not used but
-                     // cannot be empty}
     [SchemeInfoNorm] =
         {fgnorm, bgselhid,
          "#000000"}, // infobar middle  unselected {text,background,not used but
-                     // cannot be empty}
+
 };
 
 /* tagging */
@@ -57,17 +58,21 @@ static const Rule rules[] = {
 };
 
 /* layout(s) */
-static const float mfact = 0.55; /* factor of master area size [0.05..0.95] */
-static const int nmaster = 1;    /* number of clients in master area */
+static const float mfact = 0.55;  /* factor of master area size [0.05..0.95] */
+static const float smfact = 0.00; /* factor of tiled clients [0.00..0.95] */
+static const int nmaster = 1;     /* number of clients in master area */
 static const int resizehints =
     1; /* 1 means respect size hints in tiled resizals */
 
 static const Layout layouts[] = {
     /* symbol     arrange function */
-    {"[]=", tile},    /* first entry is default */
-    {"><>", NULL},    /* no layout function means floating behavior */
-    {"[M]", monocle}, /* Monocle*/
-    {"|M|", centeredmaster}, {">M>", centeredfloatingmaster}, {"HHH", grid},
+    {"[]=", tile},           /* first entry is default */
+    {"><>", NULL},           /* no layout function means floating behavior */
+    {"[M]", monocle},        /* Monocle*/
+    {"|M|", centeredmaster}, /*  Centered Master */
+    {">M>", centeredfloatingmaster}, /*  Centered Float */
+    {"HHH", grid},                   /*  Grid */
+    {"[D]", deck},                   /*  Deck  */
 };
 
 /* key definitions */
@@ -91,13 +96,14 @@ static const char *dmenucmd[] = {"dmenu_run", "-m",  dmenumon,         "-fn",
                                  dmenufont,   "-nb", bgselhid,         "-nf",
                                  fgnorm,      "-sb", selhidfgbdborder, "-sf",
                                  fgsel,       NULL};
-static const char *termcmd[] = {"alacritty", NULL};
+static const char *termcmd[] = {"st", NULL};
 
 #include "mpdcontrol.c"
 
 static Key keys[] = {
     /* modifier                     key        function        argument */
-    {MODKEY, XK_d, spawn, {.v = dmenucmd}},
+    {MODKEY, XK_d, spawn, SHCMD("rofi -modi \"drun,run\" -show drun")},
+    // {MODKEY, XK_d, spawn, {.v = dmenucmd}},
     {MODKEY, XK_Return, spawn, {.v = termcmd}},
     {MODKEY, XK_b, togglebar, {0}},
     {MODKEY, XK_j, focusstack, {.i = +1}},
@@ -106,6 +112,8 @@ static Key keys[] = {
        },*/
     {MODKEY | ShiftMask, XK_h, setmfact, {.f = -0.05}},
     {MODKEY | ShiftMask, XK_l, setmfact, {.f = +0.05}},
+    {MODKEY | ShiftMask, XK_j, setsmfact, {.f = +0.05}},
+    {MODKEY | ShiftMask, XK_k, setsmfact, {.f = -0.05}},
     {MODKEY | ShiftMask, XK_Return, zoom, {0}},
     {MODKEY, XK_Tab, view, {0}},
     {MODKEY, XK_c, killclient, {0}},
@@ -115,6 +123,7 @@ static Key keys[] = {
     {MODKEY, XK_u, setlayout, {.v = &layouts[3]}},
     {MODKEY, XK_o, setlayout, {.v = &layouts[4]}},
     {MODKEY, XK_i, setlayout, {.v = &layouts[5]}},
+    {MODKEY, XK_n, setlayout, {.v = &layouts[6]}},
     {MODKEY, XK_space, setlayout, {0}},
     {MODKEY | ShiftMask, XK_space, togglefloating, {0}},
     {MODKEY | ShiftMask, XK_f, togglefullscr, {0}},
@@ -128,17 +137,15 @@ static Key keys[] = {
     {MODKEY, XK_equal, setgaps, {.i = +1}},
     {MODKEY | ShiftMask, XK_equal, setgaps, {.i = 0}},
     {MODKEY, XK_r, spawn, SHCMD("nautilus")},
-    {MODKEY, XK_h, spawn, SHCMD("alacritty -e htop")},
-    {MODKEY | ShiftMask, XK_b, spawn, SHCMD("alacritty -e bluetoothctl")},
+    {MODKEY, XK_h, spawn, SHCMD("st -e gotop")},
+    {MODKEY | ShiftMask, XK_b, spawn, SHCMD("st -e bluetoothctl")},
     {MODKEY, XK_w, spawn, SHCMD("brave")},
     {MODKEY | ShiftMask, XK_q, quit, {0}},
     {MODKEY, XK_x, setgaps, {.i = +3}},
     {MODKEY, XK_z, setgaps, {.i = -3}},
     {MODKEY, XK_a, setgaps, {.i = 0}},
-
-    {MODKEY | ShiftMask, XK_e, spawn,
-     SHCMD("alacritty -e vim .config/alacritty/alacritty.yml")},
     {MODKEY, XK_e, spawn, SHCMD("emacs")},
+    {MODKEY | ShiftMask, XK_r, spawn, SHCMD("dm-tool switch-to-greeter")},
     TAGKEYS(XK_1, 0) TAGKEYS(XK_2, 1) TAGKEYS(XK_3, 2) TAGKEYS(XK_4, 3)
         TAGKEYS(XK_5, 4) TAGKEYS(XK_6, 5) TAGKEYS(XK_7, 6) TAGKEYS(XK_8, 7)
             TAGKEYS(XK_9, 8){0, XF86XK_AudioMute, spawn, SHCMD("pamixer -t")},
