@@ -4,6 +4,14 @@
 static const unsigned int borderpx = 2; /* border pixel of windows */
 static const unsigned int gappx = 5;    /* gaps between windows */
 static const unsigned int snap = 32;    /* snap pixel */
+static const unsigned int systraypinning =
+    0; /* 0: sloppy systray follows selected monitor, >0: pin systray to monitor
+          X */
+static const unsigned int systrayspacing = 2; /* systray spacing */
+static const int systraypinningfailfirst =
+    1; /* 1: if pinning fails, display systray on the first monitor, False:
+          display systray on the last monitor*/
+static const int showsystray = 1; /* 0 means no systray */
 static const unsigned int minwsz =
     20;                           /* Minimal heigt of a client for smfact */
 static const int showbar = 1;     /* 0 means no bar */
@@ -11,7 +19,7 @@ static const int topbar = 1;      /* 0 means bottom bar */
 static const int horizpadbar = 0; /* horizontal padding for statusbar */
 static const int vertpadbar = 0;  /* vertical padding for statusbar */
 static const char *fonts[] = {
-    "Mononoki Nerd Font:size=11:antialias=true:autohint=true",
+    "Mononoki Nerd Font:size=10:antialias=true:autohint=true",
     "Hack:size=8:antialias=true:autohint=true",
     "JoyPixels:size=10:antialias=true:autohint=true"};
 static const char dmenufont[] = "monospace:size=10";
@@ -19,8 +27,10 @@ static const char bgselhid[] = "#282a36";
 static const char border[] = "#444444";
 static const char fgnorm[] = "#f1fa8c";
 static const char fgsel[] = "#282a36";
-static const char selhidfgbdborder[] = "#50fa7b";
+static const char selhidfgbdborder[] = "#ffb86c";
 static char selbordercolor[] = "#ff5555";
+static char green[] = "#50fa7b";
+static char c[] = "#bd93f9";
 
 static const char *colors[][3] = {
     /*               fg         bg         border   */
@@ -28,24 +38,28 @@ static const char *colors[][3] = {
     [SchemeSel] = {fgsel, selhidfgbdborder, selbordercolor},
     [SchemeHid] = {selhidfgbdborder, bgselhid, selhidfgbdborder},
 
-    [SchemeStatus] = {"#50fa7b", "#44475a",
+    [SchemeStatus] = {"#f1fa8c", "#44475a",
                       "#000000"}, // Statusbar right {text,background,not used
-    [SchemeTagsSel] = {"#282a36", "#ff5555",
+
+    [SchemeTagsSel] = {"#282a36", c,
                        "#000000"}, // Tagbar left selected {text,background,not
     [SchemeTagsNorm] =
-        {fgnorm, "#44475a",
+        {green, "#44475a",
          "#000000"}, // Tagbar left unselected {text,background,not used but
     [SchemeInfoSel] =
         {fgsel, selhidfgbdborder,
          "#000000"}, // infobar middle  selected {text,background,not used but
     [SchemeInfoNorm] =
-        {fgnorm, bgselhid,
+        {fgnorm, "#232d37",
          "#000000"}, // infobar middle  unselected {text,background,not used but
 
 };
 
 /* tagging */
 static const char *tags[] = {"", "", "", "", "", "", "", "", ""};
+// static const char *tags[] = {"1", "2", "3", "4", "5", "6", "7", "8", "9"};
+// static const char *tags[] = {"I", "II", "III", "IV", "V", "VI", "VII",
+// "VIII", "IX"};
 
 static const Rule rules[] = {
     /* xprop(1):
@@ -102,7 +116,8 @@ static const char *termcmd[] = {"st", NULL};
 
 static Key keys[] = {
     /* modifier                     key        function        argument */
-    {MODKEY, XK_d, spawn, SHCMD("rofi -modi \"drun,run\" -show drun")},
+    {MODKEY, XK_p, spawn, SHCMD("rofi -modi \"drun,run\" -show drun")},
+    {MODKEY, XK_d, spawn, SHCMD("dmenu_run -c -l 15")},
     // {MODKEY, XK_d, spawn, {.v = dmenucmd}},
     {MODKEY, XK_Return, spawn, {.v = termcmd}},
     {MODKEY, XK_b, togglebar, {0}},
@@ -161,7 +176,7 @@ static Key keys[] = {
     {0, XF86XK_AudioStop, spawn, SHCMD("mpc stop")},
     {0, XF86XK_AudioRewind, spawn, SHCMD("mpc seek -10")},
     {0, XF86XK_AudioForward, spawn, SHCMD("mpc seek +10")},
-    {0, XF86XK_RFKill, spawn, SHCMD("slock")},
+    {0, XF86XK_RFKill, spawn, SHCMD("betterlockscreen -l")},
     /* MOVE AND RESIZE KEYBINDINGS*/
     {MODKEY, XK_Down, moveresize, {.v = "0x 25y 0w 0h"}},
     {MODKEY, XK_Up, moveresize, {.v = "0x -25y 0w 0h"}},
