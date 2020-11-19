@@ -78,3 +78,21 @@ easy on the eye.
 | Purple       | =#bd93f9= | [[https://draculatheme.com/static/img/color-boxes/purple.png]]       |
 | Red          | =#ff5555= | [[https://draculatheme.com/static/img/color-boxes/red.png]]          |
 | Yellow       | =#f1fa8c= | [[https://draculatheme.com/static/img/color-boxes/yellow.png]]       |
+
+** Some Apps
++ Rofi
++ Dmenu
++ Simple Terminal
++ Nautilus
++ Htop
++ Bluetoothctl
++ Brave Browser
++ Emacs
++ Flameshot
++ Pamixer AUR
++ light from AUR
++ Betterlockscreen AUR
+
+#+BEGIN_SRC bash
+ yay -S rofi brave-bin nautilus htop blueman emacs flameshot pamixer light betterlockscreen
+#+END_SRC

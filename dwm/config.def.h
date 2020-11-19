@@ -5,11 +5,16 @@
 static const unsigned int borderpx = 0; /* border pixel of windows */
 static const unsigned int gappx = 5;    /* gaps between windows */
 static const unsigned int snap = 5;     /* snap pixel */
-static const unsigned int systraypinning = 0; /* 0: sloppy systray follows selected monitor, >0: pin systray to monitor X */
+static const unsigned int systraypinning =
+    0; /* 0: sloppy systray follows selected monitor, >0: pin systray to monitor
+          X */
 static const unsigned int systrayspacing = 2; /* systray spacing */
-static const int systraypinningfailfirst = 1; /* 1: if pinning fails, display systray on the first monitor, False: display systray on the last monitor*/
+static const int systraypinningfailfirst =
+    1; /* 1: if pinning fails, display systray on the first monitor, False:
+          display systray on the last monitor*/
 static const int showsystray = 1; /* 0 means no systray */
-static const unsigned int minwsz = 20;  /* Minimal heigt of a client for smfact */
+static const unsigned int minwsz =
+    20;                           /* Minimal heigt of a client for smfact */
 static const int showbar = 1;     /* 0 means no bar */
 static const int topbar = 1;      /* 0 means bottom bar */
 static const int horizpadbar = 0; /* horizontal padding for statusbar */
@@ -36,11 +41,19 @@ static const char *colors[][3] = {
     [SchemeSel] = {fgsel, selhidfgbdborder, selbordercolor},
     [SchemeHid] = {selhidfgbdborder, bgselhid, selhidfgbdborder},
 
-    [SchemeStatus] = {"#f1fa8c", "#44475a", "#000000"}, // Statusbar right {text,background,not used
-    [SchemeTagsSel] = {"#282a36", c, "#000000"}, // Tagbar left selected {text,background,not
-    [SchemeTagsNorm] = {green, "#44475a", "#000000"}, // Tagbar left unselected {text,background,not used but
-    [SchemeInfoSel] = {fgsel, selhidfgbdborder, "#000000"}, // infobar middle  selected {text,background,not used but
-    [SchemeInfoNorm] = {fgnorm, "#232d37", "#000000"}, // infobar middle  unselected {text,background,not used but
+    [SchemeStatus] = {"#f1fa8c", "#44475a",
+                      "#000000"}, // Statusbar right {text,background,not used
+    [SchemeTagsSel] = {"#282a36", c,
+                       "#000000"}, // Tagbar left selected {text,background,not
+    [SchemeTagsNorm] =
+        {green, "#44475a",
+         "#000000"}, // Tagbar left unselected {text,background,not used but
+    [SchemeInfoSel] =
+        {fgsel, selhidfgbdborder,
+         "#000000"}, // infobar middle  selected {text,background,not used but
+    [SchemeInfoNorm] =
+        {fgnorm, "#232d37",
+         "#000000"}, // infobar middle  unselected {text,background,not used but
 };
 
 /* tagging */
@@ -58,7 +71,7 @@ static const Rule rules[] = {
 };
 
 /* layout(s) */
-static const float mfact = 0.55;  /* factor of master area size [0.05..0.95] */
+static const float mfact = 0.5;   /* factor of master area size [0.05..0.95] */
 static const float smfact = 0.00; /* factor of tiled clients [0.00..0.95] */
 static const int nmaster = 1;     /* number of clients in master area */
 static const int resizehints =
@@ -78,7 +91,7 @@ static const Layout layouts[] = {
 /* key definitions */
 #define MODKEY Mod4Mask
 #define TAGKEYS(KEY, TAG)                                                      \
-      {MODKEY, KEY, view, {.ui = 1 << TAG}},                                   \
+  {MODKEY, KEY, view, {.ui = 1 << TAG}},                                       \
       {MODKEY | ControlMask, KEY, toggleview, {.ui = 1 << TAG}},               \
       {MODKEY | ShiftMask, KEY, tag, {.ui = 1 << TAG}},                        \
       {MODKEY | ControlMask | ShiftMask, KEY, toggletag, {.ui = 1 << TAG}},
@@ -109,6 +122,7 @@ static Key keys[] = {
     {MODKEY, XK_b, togglebar, {0}},
     {MODKEY, XK_j, focusstack, {.i = +1}},
     {MODKEY, XK_k, focusstack, {.i = -1}},
+    {MODKEY | ShiftMask, XK_q, quit, {.i = 23}},
 
     {MODKEY | ShiftMask, XK_h, setmfact, {.f = -0.05}},
     {MODKEY | ShiftMask, XK_l, setmfact, {.f = +0.05}},
@@ -147,15 +161,9 @@ static Key keys[] = {
     {0, XK_Print, spawn, SHCMD("flameshot gui")},
 
     // TAGKEYS
-    TAGKEYS(XK_1, 0)
-    TAGKEYS(XK_2, 1) 
-    TAGKEYS(XK_3, 2) 
-    TAGKEYS(XK_4, 3)
-    TAGKEYS(XK_5, 4) 
-    TAGKEYS(XK_6, 5) 
-    TAGKEYS(XK_7, 6) 
-    TAGKEYS(XK_8, 7)
-    TAGKEYS(XK_9, 8)
+    TAGKEYS(XK_1, 0) TAGKEYS(XK_2, 1) TAGKEYS(XK_3, 2) TAGKEYS(XK_4, 3)
+        TAGKEYS(XK_5, 4) TAGKEYS(XK_6, 5) TAGKEYS(XK_7, 6) TAGKEYS(XK_8, 7)
+            TAGKEYS(XK_9, 8)
 
     // AUDIO AND BRIGHTNESS
     {0, XF86XK_AudioMute, spawn, SHCMD("pamixer -t")},
