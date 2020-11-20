@@ -74,8 +74,7 @@ Function that inserts image to org file from clipboard.
   (make-directory "./resources/" :parents)
   (let ((filename (concat (format-time-string "%Y_%m_%d_%H%M%S") ".png")))
     (shell-command (concat "cd resources && " "xclip -selection clipboard -t image/png -o > " filename))
-    (insert (concat "[[./resources/" filename "]]")))
-  (org-display-inline-images))
+    (insert (concat "[[./resources/" filename "]]"))))
 #+END_SRC
 
 * Clang Support

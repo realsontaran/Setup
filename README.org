@@ -51,9 +51,8 @@ and customize. ## *Shell* [[https://fishshell.com/][Fish shell]] with
 [[https://github.com/oh-my-fish/theme-batman][Batman Theme]].
 [[file:resources/st.png]]
 
-** *Text Editor:* [[https://github.com/hlissner/doom-emacs][Doom Emacs
-[[./resources/2020_11_20_161157.png]]]]
-
+** *Text Editor:* [[https://github.com/hlissner/doom-emacs][Doom Emacs]]
+[[./resources/2020_11_20_162831.png]]
 ** *Wallpaper:* [[file:resources/WP.png]]
    :PROPERTIES:
    :CUSTOM_ID: wallpaper-wp
