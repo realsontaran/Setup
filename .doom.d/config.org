@@ -1,0 +1,118 @@
+#+TITLE: Doom Emacs Config
+#+AUTHOR: realsontaran
+#+STARTUP: showeverything
+#+PROPERTY: header-args :tangle config.el
+
+* User
+#+BEGIN_SRC emacs-lisp
+(setq user-full-name "realsontaran"
+      user-mail-address "therealsontaran@protonmailcom")
+#+END_SRC
+
+* Font, Theme and Splash Screen
+Setting up nice user interface.
+
+#+BEGIN_SRC emacs-lisp
+(setq doom-font (font-spec :family "Mononoki Nerd Font" :size 14)
+      doom-variable-pitch-font (font-spec :family "Mononoki Nerd Font" :size 14))
+(setq display-line-numbers-type t)
+(setq fancy-splash-image "~/.doom.d/icons/doom.png")
+(setq doom-theme 'srcery)
+
+;; Add some transparency
+(set-frame-parameter (selected-frame) 'alpha '(90 90))
+(add-to-list 'default-frame-alist '(alpha 90 90))
+(windmove-default-keybindings)
+#+END_SRC
+
+* ORG-MODE
+Setting todo keywords, org-agenda directories and some keymapping for funcional workspace.
+#+BEGIN_SRC emacs-lisp
+(after! org
+  (setq org-directory "~/Workshop/BooksAndNotes/org/")
+  (setq org-log-done 'time)
+  (setq org-agenda-files (directory-files-recursively "~/Workshop/BooksAndNotes/org/" "\\.org$"))
+  (setq org-todo-keywords
+        '((sequence "TODO" "PROJ" "HOMWRK" "STRT" "WAIT" "HOLD" "|" "DONE" "CNCL")
+          (sequence "[ ]" "[-]" "[?]" "|" "[X]")
+          (sequence "LECTURE(l)" "|")
+          ))
+  (setq org-todo-keyword-faces
+        '(("TODO" . "orange")
+          ("HOMWRK" . "orange")
+          ("STRT" . "yellow")
+          ("WAIT" . "yellow")
+          ("DONE" . "green")
+          ("CNCL" . (:foreground "red" :weight bold))
+          ("LECTURE" . "purple")
+          ("[ ]" . "orange")
+          ("[-]" . "yellow")
+          ("[?]" . "red")
+          ("[X]" . "green")
+          ))
+  (require 'org-bullets)
+  (add-hook 'org-mode-hook (lambda ()
+                             (org-bullets-mode 1)
+                             (prettify-symbols-mode)))
+  (map!
+   :map 'org-mode-map
+   :localleader
+   :ni "U" #'org-latex-preview)
+
+  (map!
+   :map 'org-mode-map
+   :localleader
+   :ni "v" #'org-insert-clipboard-image))
+#+END_SRC
+
+Function that inserts image to org file from clipboard.
+
+#+BEGIN_SRC emacs-lisp
+(defun org-insert-clipboard-image ()
+  "Insert screenshot to org file"
+  (interactive)
+  (make-directory "./resources/" :parents)
+  (let ((filename (concat (format-time-string "%Y_%m_%d_%H%M%S") ".png")))
+    (shell-command (concat "cd resources && " "xclip -selection clipboard -t image/png -o > " filename))
+    (insert (concat "[[./resources/" filename "]]")))
+  (org-display-inline-images))
+#+END_SRC
+
+* Clang Support
+Giving my clang formatter file to emacs and setting a keybinding.
+#+BEGIN_SRC emacs-lisp
+(load "/usr/share/clang/clang-format.el")
+(global-set-key [C-M-tab] 'clang-format-region)
+#+END_SRC
+
+* Treemacs Configuration
+Changing and adding some icons to the treemacs configuration.
+#+BEGIN_SRC emacs-lisp
+(require 'tree-sitter-langs)
+(after! tree-sitter-langs
+  (global-tree-sitter-mode)
+  (add-hook! 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
+(after! treemacs
+  (treemacs-modify-theme "Default"
+                         :icon-directory (f-join treemacs-dir "icons/default/vsc")
+                         :config
+                         (progn
+                           (treemacs-create-icon :file "cmake.png"  :extensions ("cmakecache.txt"))
+                           (treemacs-create-icon :file "cmake.png"  :extensions ("cmakelists.txt"))))
+  (treemacs-create-icon :file "txt.png"  :extensions ("txt"))
+  (setq doom-themes-treemacs-theme "Default"))
+#+END_SRC
+
+* Discord Support for Gamers
+My Elcord package configuration with personal discord app to rich presence.
+#+BEGIN_SRC emacs-lisp
+(require 'elcord)
+(after! elcord
+  (setq  elcord-client-id "776170979415031819"
+        elcord-use-major-mode-as-main-icon t
+        elcord--editor-icon "emacs_icon")
+  (push '(dart-mode . "dart-mode_icon") elcord-mode-icon-alist)
+  (push '("Org-Agenda" . "org-mode_icon") elcord-mode-icon-alist)
+  (push '("pdf-view" . "pdf-mode_icon") elcord-mode-icon-alist)
+  (elcord-mode))
+#+END_SRC

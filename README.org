@@ -4,14 +4,14 @@
   :END:
 
 #+CAPTION: All
-[[file:Screenshots/All.png]]
+[[file:resources/All.png]]
 
 ** *Distro:* [[https://www.archlinux.org/][Arch Linux]] A simple, lightweight distribution
    :PROPERTIES:
    :CUSTOM_ID: distro-arch-linux-a-simple-lightweight-distribution
    :END:
 
-** [[file:Screenshots/distro.png]]
+** [[file:resources/distro.png]]
    :PROPERTIES:
    :CUSTOM_ID: neofetch
    :END:
@@ -49,9 +49,12 @@ scripts . You can add and remove all modules to bar as you wish.
 and customize. ## *Shell* [[https://fishshell.com/][Fish shell]] with
 [[https://github.com/oh-my-fish/oh-my-fish][Oh my fish]]
 [[https://github.com/oh-my-fish/theme-batman][Batman Theme]].
-[[file:Screenshots/st.png]]
+[[file:resources/st.png]]
 
-** *Wallpaper:* [[file:Screenshots/WP.png]]
+** *Text Editor:* [[https://github.com/hlissner/doom-emacs][Doom Emacs
+[[./resources/2020_11_20_161157.png]]]]
+
+** *Wallpaper:* [[file:resources/WP.png]]
    :PROPERTIES:
    :CUSTOM_ID: wallpaper-wp
    :END:
