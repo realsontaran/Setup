@@ -95,3 +95,5 @@
 (package! srcery-theme)
 (package! exwm)
 (package! multiple-cursors)
+(package! dmenu)
+(package! edwina :disable t)

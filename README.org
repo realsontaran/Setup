@@ -52,7 +52,8 @@ and customize. ## *Shell* [[https://fishshell.com/][Fish shell]] with
 [[file:resources/st.png]]
 
 ** *Text Editor:* [[https://github.com/hlissner/doom-emacs][Doom Emacs]]
-[[./resources/2020_11_20_162831.png]]
+[[./resources/2020_11_21_235417.png]]
+
 ** *Wallpaper:* [[file:resources/WP.png]]
    :PROPERTIES:
    :CUSTOM_ID: wallpaper-wp
@@ -67,7 +68,7 @@ and customize. ## *Shell* [[https://fishshell.com/][Fish shell]] with
 easy on the eye.
 
 | Palette      | Hex       | [[https://draculatheme.com/static/img/color-boxes/eyedropper.png]]   |
-|--------------+-----------+----------------------------------------------------------------------|
+|--------------+-----------+------------------------------------------------------------------|
 | Background   | =#282a36= | [[https://draculatheme.com/static/img/color-boxes/background.png]]   |
 | Current Line | =#44475a= | [[https://draculatheme.com/static/img/color-boxes/current_line.png]] |
 | Selection    | =#44475a= | [[https://draculatheme.com/static/img/color-boxes/selection.png]]    |

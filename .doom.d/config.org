@@ -3,21 +3,30 @@
 #+STARTUP: showeverything
 #+PROPERTY: header-args :tangle config.el
 
-* User
+* My Doom Emacs Config
+** User
 #+BEGIN_SRC emacs-lisp
 (setq user-full-name "realsontaran"
       user-mail-address "therealsontaran@protonmailcom")
 #+END_SRC
 
-* Font, Theme and Splash Screen
+** Font, Theme and Splash Screen
 Setting up nice user interface.
 
 #+BEGIN_SRC emacs-lisp
-(setq doom-font (font-spec :family "Mononoki Nerd Font" :size 14)
-      doom-variable-pitch-font (font-spec :family "Mononoki Nerd Font" :size 14))
+;(setq doom-font (font-spec :family "Mononoki Nerd Font" :size 14)
+;      doom-variable-pitch-font (font-spec :family "Mononoki Nerd Font" :size 14))
+
+(setq doom-font (font-spec :family "JetBrains Mono" :size 14)
+      doom-big-font (font-spec :family "JetBrains Mono" :size 24)
+      doom-variable-pitch-font (font-spec :family "Overpass" :size 24)
+      doom-serif-font (font-spec :family "IBM Plex Mono" :weight 'light))
+
 (setq display-line-numbers-type t)
 (setq fancy-splash-image "~/.doom.d/icons/doom.png")
-(setq doom-theme 'srcery)
+(setq doom-theme 'doom-one)
+(custom-set-faces!
+  '(doom-modeline-buffer-modified :foreground "orange"))
 
 ;; Add some transparency
 (set-frame-parameter (selected-frame) 'alpha '(90 90))
@@ -25,7 +34,34 @@ Setting up nice user interface.
 (windmove-default-keybindings)
 #+END_SRC
 
-* ORG-MODE
+** Variable Setting
+Setting some values.
+#+BEGIN_SRC emacs-lisp
+(setq-default
+ delete-by-moving-to-trash t
+ window-combination-resize t)
+
+(setq doom-fallback-buffer-name "► Doom"
+      +doom-dashboard-name "► Doom")
+
+;; Mode-line
+(display-time-mode t)
+(unless (equal "Battery status not available"
+               (battery))
+  (display-battery-mode 1))
+#+END_SRC
+** Which-Key Pop-Up
+#+BEGIN_SRC emacs-lisp
+(setq which-key-idle-delay 0.5)
+(setq which-key-allow-multiple-replacements t)
+(after! which-key
+  (pushnew!
+   which-key-replacement-alist
+   '(("" . "\\`+?evil[-:]?\\(?:a-\\)?\\(.*\\)") . (nil . "◂\\1"))
+   '(("\\`g s" . "\\`evilem--?motion-\\(.*\\)") . (nil . "◃\\1"))
+   ))
+#+END_SRC
+** ORG-MODE
 Setting todo keywords, org-agenda directories and some keymapping for funcional workspace.
 #+BEGIN_SRC emacs-lisp
 (after! org
@@ -63,6 +99,22 @@ Setting todo keywords, org-agenda directories and some keymapping for funcional 
    :map 'org-mode-map
    :localleader
    :ni "v" #'org-insert-clipboard-image))
+
+;; Create new Org buffer.
+(evil-define-command evil-buffer-org-new (count file)
+  "Creates a new ORG buffer replacing the current window, optionally
+   editing a certain FILE"
+  :repeat nil
+  (interactive "P<f>")
+  (if file
+      (evil-edit file)
+    (let ((buffer (generate-new-buffer "*new org*")))
+      (set-window-buffer nil buffer)
+      (with-current-buffer buffer
+        (org-mode)))))
+(map! :leader
+      (:prefix "b"
+       :desc "New empty ORG buffer" "o" #'evil-buffer-org-new))
 #+END_SRC
 
 Function that inserts image to org file from clipboard.
@@ -76,15 +128,20 @@ Function that inserts image to org file from clipboard.
     (shell-command (concat "cd resources && " "xclip -selection clipboard -t image/png -o > " filename))
     (insert (concat "[[./resources/" filename "]]"))))
 #+END_SRC
+** Window Keybinding
+I wasn't comfortable with splitting windows with Ctrl commands.
+#+BEGIN_SRC emacs-lisp
+(map! :leader :desc "find-file-other-window" "d" #'find-file-other-window)
+#+END_SRC
 
-* Clang Support
+** Clang Support
 Giving my clang formatter file to emacs and setting a keybinding.
 #+BEGIN_SRC emacs-lisp
 (load "/usr/share/clang/clang-format.el")
 (global-set-key [C-M-tab] 'clang-format-region)
 #+END_SRC
 
-* Treemacs Configuration
+** Treemacs Configuration
 Changing and adding some icons to the treemacs configuration.
 #+BEGIN_SRC emacs-lisp
 (require 'tree-sitter-langs)
@@ -102,7 +159,7 @@ Changing and adding some icons to the treemacs configuration.
   (setq doom-themes-treemacs-theme "Default"))
 #+END_SRC
 
-* Discord Support for Gamers
+** Discord Support for Gamers
 My Elcord package configuration with personal discord app to rich presence.
 #+BEGIN_SRC emacs-lisp
 (require 'elcord)
@@ -114,4 +171,98 @@ My Elcord package configuration with personal discord app to rich presence.
   (push '("Org-Agenda" . "org-mode_icon") elcord-mode-icon-alist)
   (push '("pdf-view" . "pdf-mode_icon") elcord-mode-icon-alist)
   (elcord-mode))
+#+END_SRC
+
+** EWW
+EWW is the Emacs Web Wowser, the builtin browser in Emacs. SPC-e was available for this job.
+#+BEGIN_SRC emacs-lisp
+(setq browse-url-browser-function 'eww-browse-url)
+(map! :leader
+      :desc "Eww web browser"
+      "e w" #'eww
+      :leader
+      :desc "Eww reload page"
+      "e R" #'eww-reload
+      :leader
+      :desc "Search web for text between BEG/END"
+      "s w" #'eww-search-words)
+#+END_SRC
+
+** EXWM
+EXWM is Emacs based window manager.There is DistroTube configuration with small changes in case urge of WM hopping .d.
+#+BEGIN_SRC emacs-lisp
+(require 'exwm)
+(require 'exwm-config)
+(require 'exwm-systemtray)
+(exwm-systemtray-enable)
+(require 'exwm-randr)
+(exwm-randr-enable)
+(add-hook 'exwm-randr-screen-change-hook
+          (lambda ()
+            (start-process-shell-command
+             "xrandr" nil "xrandr --output eDPI1 --mode 1920x1080 --pos 0x0 --rotate normal")))
+(setq exwm-workspace-number 10
+      exwm-randr-workspace-output-plist '(0 "eDPI1")
+      exwm-input-prefix-keys '(?\M-x ?\M-:)
+      exwm-input-simulation-keys '(([?\s-F] . [?\C-f]))
+      exwm-input-global-keys '(([?\s-&] . (lambda (command)
+                                            (interactive (list (read-shell-command "$ ")))
+                                            (start-process-shell-command command nil command)))
+                               ;; splits
+                               ([?\s-v] . evil-window-vsplit)
+                               ([?\s-z] . evil-window-split)
+                               ;; managing workspaces
+                               ([?\s-w] . exwm-workspace-switch)
+                               ([?\s-W] . exwm-workspace-swap)
+                               ([?\s-\C-w] . exwm-workspace-move)
+                               ;; essential programs
+                               ([?\s-d] . dired)
+                               ([s-return] . eshell)
+                               ([s-S-return] . dmenu)
+                               ;; killing buffers and windows
+                               ([?\s-b] . ibuffer)
+                               ([?\s-B] . kill-current-buffer)
+                               ([?\s-c] . +workspace/close-window-or-workspace)
+                               ;; change window focus with super+h,j,k,l
+                               ([?\s-h] . evil-window-left)
+                               ([?\s-j] . evil-window-next)
+                               ([?\s-k] . evil-window-prev)
+                               ([?\s-l] . evil-window-right)
+                               ;; move windows around using SUPER+SHIFT+h,j,k,l
+                               ([?\s-H] . +evil/window-move-left)
+                               ([?\s-J] . +evil/window-move-down)
+                               ([?\s-K] . +evil/window-move-up)
+                               ([?\s-L] . +evil/window-move-right)
+                               ;; move window to far left or far right with SUPER+CTRL+h,l
+                               ([?\s-\C-h] . side-left-window)
+                               ([?\s-\C-j] . side-bottom-window)
+                               ([?\s-\C-l] . side-right-window)
+                               ([?\s-\C-d] . side-window-delete-all)
+                               ([?\s-\C-r] . resize-window)
+                               ;; switch workspace with SUPER+{0-9}
+                               ([?\s-0] . (lambda () (interactive) (exwm-workspace-switch-create 0)))
+                               ([?\s-1] . (lambda () (interactive) (exwm-workspace-switch-create 1)))
+                               ([?\s-2] . (lambda () (interactive) (exwm-workspace-switch-create 2)))
+                               ([?\s-3] . (lambda () (interactive) (exwm-workspace-switch-create 3)))
+                               ([?\s-4] . (lambda () (interactive) (exwm-workspace-switch-create 4)))
+                               ([?\s-5] . (lambda () (interactive) (exwm-workspace-switch-create 5)))
+                               ([?\s-6] . (lambda () (interactive) (exwm-workspace-switch-create 6)))
+                               ([?\s-7] . (lambda () (interactive) (exwm-workspace-switch-create 7)))
+                               ([?\s-8] . (lambda () (interactive) (exwm-workspace-switch-create 8)))
+                               ([?\s-9] . (lambda () (interactive) (exwm-workspace-switch-create 9)))
+                               ;; move window workspace with SUPER+SHIFT+{0-9}
+                               ([?\s-\)] . (lambda () (interactive) (exwm-workspace-move-window 0)))
+                               ([?\s-!] . (lambda () (interactive) (exwm-workspace-move-window 1)))
+                               ([?\s-@] . (lambda () (interactive) (exwm-workspace-move-window 2)))
+                               ([?\s-#] . (lambda () (interactive) (exwm-workspace-move-window 3)))
+                               ([?\s-$] . (lambda () (interactive) (exwm-workspace-move-window 4)))
+                               ([?\s-%] . (lambda () (interactive) (exwm-workspace-move-window 5)))
+                               ([?\s-^] . (lambda () (interactive) (exwm-workspace-move-window 6)))
+                               ([?\s-&] . (lambda () (interactive) (exwm-workspace-move-window 7)))
+                               ([?\s-*] . (lambda () (interactive) (exwm-workspace-move-window 8)))
+                               ([?\s-\(] . (lambda () (interactive) (exwm-workspace-move-window 9)))
+                               ;; setting some toggle commands
+                               ([?\s-f] . exwm-floating-toggle-floating)
+                               ([?\s-m] . exwm-layout-toggle-mode-line)
+                               ([f11] . exwm-layout-toggle-fullscreen)))
 #+END_SRC
