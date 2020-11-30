@@ -97,3 +97,4 @@
 (package! multiple-cursors)
 (package! dmenu)
 (package! edwina :disable t)
+(package! mips-mode)

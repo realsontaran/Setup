@@ -18,8 +18,8 @@ Setting up nice user interface.
 ;      doom-variable-pitch-font (font-spec :family "Mononoki Nerd Font" :size 14))
 
 (setq doom-font (font-spec :family "JetBrains Mono" :size 14)
-      doom-big-font (font-spec :family "JetBrains Mono" :size 24)
-      doom-variable-pitch-font (font-spec :family "Overpass" :size 24)
+      doom-big-font (font-spec :family "JetBrains Mono" :size 20)
+      doom-variable-pitch-font (font-spec :family "Overpass" :size 20)
       doom-serif-font (font-spec :family "IBM Plex Mono" :weight 'light))
 
 (setq display-line-numbers-type t)
@@ -29,8 +29,8 @@ Setting up nice user interface.
   '(doom-modeline-buffer-modified :foreground "orange"))
 
 ;; Add some transparency
-(set-frame-parameter (selected-frame) 'alpha '(90 90))
-(add-to-list 'default-frame-alist '(alpha 90 90))
+;; (set-frame-parameter (selected-frame) 'alpha '(90 90))
+;; (add-to-list 'default-frame-alist '(alpha 90 90))
 (windmove-default-keybindings)
 #+END_SRC
 
@@ -41,8 +41,8 @@ Setting some values.
  delete-by-moving-to-trash t
  window-combination-resize t)
 
-(setq doom-fallback-buffer-name "► Doom"
-      +doom-dashboard-name "► Doom")
+;; (setq doom-fallback-buffer-name "► Doom"
+;;       +doom-dashboard-name "► Doom")
 
 ;; Mode-line
 (display-time-mode t)
@@ -69,21 +69,19 @@ Setting todo keywords, org-agenda directories and some keymapping for funcional 
   (setq org-log-done 'time)
   (setq org-agenda-files (directory-files-recursively "~/Workshop/BooksAndNotes/org/" "\\.org$"))
   (setq org-todo-keywords
-        '((sequence "TODO" "PROJ" "HOMWRK" "STRT" "WAIT" "HOLD" "|" "DONE" "CNCL")
-          (sequence "[ ]" "[-]" "[?]" "|" "[X]")
+        '((sequence "TODO" "PROJ" "HOMWRK" "|" "DONE" "CNCL")
+          (sequence "TODAY" "NEXT" "IMPORTANT" "READ")
+          (sequence "[ ]" "[-]" "|" "[X]")
           (sequence "LECTURE(l)" "|")
           ))
   (setq org-todo-keyword-faces
         '(("TODO" . "orange")
           ("HOMWRK" . "orange")
-          ("STRT" . "yellow")
-          ("WAIT" . "yellow")
           ("DONE" . "green")
           ("CNCL" . (:foreground "red" :weight bold))
           ("LECTURE" . "purple")
           ("[ ]" . "orange")
           ("[-]" . "yellow")
-          ("[?]" . "red")
           ("[X]" . "green")
           ))
   (require 'org-bullets)
@@ -128,6 +126,57 @@ Function that inserts image to org file from clipboard.
     (shell-command (concat "cd resources && " "xclip -selection clipboard -t image/png -o > " filename))
     (insert (concat "[[./resources/" filename "]]"))))
 #+END_SRC
+** Org-Super-Agenda
+#+BEGIN_SRC emacs-lisp
+(after! org-agenda
+  (org-super-agenda-mode))
+
+(setq org-agenda-skip-scheduled-if-done t
+      org-agenda-skip-deadline-if-done t
+      org-agenda-include-deadlines t
+      org-agenda-block-separator nil
+      org-agenda-tags-column 100
+      org-agenda-compact-blocks t)
+
+(setq org-agenda-custom-commands
+      '(("o" "Overview"
+         ((agenda "" ((org-agenda-span 'day)
+                      (org-super-agenda-groups
+                       '((:name "Today"
+                          :time-grid t
+                          :date today
+                          :todo "TODAY"
+                          :scheduled today
+                          :order 1)))))
+          (alltodo "" ((org-agenda-overriding-header "")
+                       (org-super-agenda-groups
+                        '((:name "Next to do"
+                           :todo "NEXT"
+                           :order 1)
+                          (:name "Important"
+                           :tag "IMPORTANT"
+                           :priority "A"
+                           :order 6)
+                          (:name "Due Today"
+                           :deadline today
+                           :order 2)
+                          (:name "Due Soon"
+                           :deadline future
+                           :order 8)
+                          (:name "Overdue"
+                           :deadline past
+                           :face error
+                           :order 7)
+                          (:name "Assignments"
+                           :tag "HOMWRK"
+                           :order 10)
+                          (:name "Projects"
+                           :tag "PROJ"
+                           :order 14)
+                          (:name "To read"
+                           :tag "Read"
+                           :order 15)))))))))
+#+END_SRC
 ** Window Keybinding
 I wasn't comfortable with splitting windows with Ctrl commands.
 #+BEGIN_SRC emacs-lisp
@@ -144,10 +193,6 @@ Giving my clang formatter file to emacs and setting a keybinding.
 ** Treemacs Configuration
 Changing and adding some icons to the treemacs configuration.
 #+BEGIN_SRC emacs-lisp
-(require 'tree-sitter-langs)
-(after! tree-sitter-langs
-  (global-tree-sitter-mode)
-  (add-hook! 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
 (after! treemacs
   (treemacs-modify-theme "Default"
                          :icon-directory (f-join treemacs-dir "icons/default/vsc")
