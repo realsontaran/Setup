@@ -53,15 +53,9 @@
            :repo "ubolonton/emacs-tree-sitter"
            :files ("lisp/*.el")))
 
-(package! tree-sitter-langs
-  :recipe (:host github
-           :repo "ubolonton/emacs-tree-sitter"
-           :files ("langs/*.el" "langs/queries")))
 (package! treemacs)
 (package! elcord)
 (package! doom-themes)
-(package! gruvbox-theme)
-(package! sweet-theme)
 (package! cpputils-cmake)
 (package! cmake-font-lock)
 (package! flycheck-rtags)
@@ -78,14 +72,8 @@
 (package! org-plus-contrib)
 (package! irony)
 (package! flycheck)
-(package! kaolin-themes)
 (package! all-the-icons)
-(package! ayu-theme)
-(package! tango-plus-theme)
-(package! subatomic-theme)
 (package! org-bullets)
-(package! color-theme-sanityinc-tomorrow :disable t)
-(package! base16-theme :disable t)
 (package! org-super-agenda)
 (package! emojify)
 (package! yasnippet-snippets)
@@ -95,6 +83,3 @@
 (package! srcery-theme)
 (package! exwm)
 (package! multiple-cursors)
-(package! dmenu)
-(package! edwina :disable t)
-(package! mips-mode)

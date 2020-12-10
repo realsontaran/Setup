@@ -2240,7 +2240,7 @@ int updategeom(void) {
     free(unique);
   } else
 #endif /* XINERAMA */
-  {    /* default monitor setup */
+  { /* default monitor setup */
     if (!mons)
       mons = createmon();
     if (mons->mw != sw || mons->mh != sh) {

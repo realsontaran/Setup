@@ -62,8 +62,8 @@ static const char *tags[] = {"", "", "", "", "", "", "", "�
 
 static const Rule rules[] = {
     /* xprop(1):
-     *	WM_CLASS(STRING) = instance, class
-     *	WM_NAME(STRING) = title
+     *  WM_CLASS(STRING) = instance, class
+     *  WM_NAME(STRING) = title
      */
     /* class      instance    title       tags mask     isfloating   monitor */
     {"Gimp", NULL, NULL, 0, 1, -1},
@@ -191,6 +191,21 @@ static Key keys[] = {
     {MODKEY | ControlMask | ShiftMask, XK_Down, moveresizeedge, {.v = "B"}},
     {MODKEY | ControlMask | ShiftMask, XK_Left, moveresizeedge, {.v = "L"}},
     {MODKEY | ControlMask | ShiftMask, XK_Right, moveresizeedge, {.v = "R"}},
+
+    /* Multi Monitor*/
+    {MODKEY, XK_comma, focusmon, {.i = -1}},
+    {MODKEY, XK_period, focusmon, {.i = +1}},
+    {MODKEY | ShiftMask, XK_comma, tagmon, {.i = -1}},
+    {MODKEY | ShiftMask, XK_period, tagmon, {.i = +1}},
+
+    {MODKEY, XK_comma, spawn,
+     SHCMD("python3 /home/penguin/Desktop/cursor.py left")},
+    {MODKEY, XK_period, spawn,
+     SHCMD("python3 /home/penguin/Desktop/cursor.py right")},
+    {MODKEY | ShiftMask, XK_comma, spawn,
+     SHCMD("python3 /home/penguin/Desktop/cursor.py left")},
+    {MODKEY | ShiftMask, XK_period, spawn,
+     SHCMD("python3 /home/penguin/Desktop/cursor.py right")},
 };
 
 /* button definitions */
