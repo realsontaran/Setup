@@ -83,3 +83,6 @@
 (package! srcery-theme)
 (package! exwm)
 (package! multiple-cursors)
+(package! edwina)
+(package! color-theme-sanityinc-tomorrow)
+(package! fira-code-mode)
