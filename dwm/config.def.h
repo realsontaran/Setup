@@ -157,8 +157,10 @@ static Key keys[] = {
     {MODKEY, XK_h, spawn, SHCMD("st -e htop")},
     {MODKEY | ShiftMask, XK_b, spawn, SHCMD("st -e bluetoothctl")},
     {MODKEY, XK_w, spawn, SHCMD("brave")},
-    {MODKEY, XK_e, spawn, SHCMD("emacs")},
+    {MODKEY, XK_e, spawn,
+     SHCMD("emacsclient -a \"\" -c -q")},
     {0, XK_Print, spawn, SHCMD("flameshot gui")},
+    {MODKEY, XK_v, spawn, SHCMD("copyq toggle")},
 
     // TAGKEYS
     TAGKEYS(XK_1, 0) TAGKEYS(XK_2, 1) TAGKEYS(XK_3, 2) TAGKEYS(XK_4, 3)

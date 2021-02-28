@@ -5,23 +5,23 @@
 
 * My Doom Emacs Config
 ** User
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (setq user-full-name "realsontaran"
       user-mail-address "therealsontaran@protonmailcom")
-#+END_SRC
+#+end_src
 
 ** Font, Theme and Splash Screen
 Setting up nice user interface.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (setq doom-font (font-spec :family "JetBrains Mono" :size 14)
       doom-big-font (font-spec :family "JetBrains Mono" :size 20)
       doom-variable-pitch-font (font-spec :family "Overpass" :size 20)
       doom-serif-font (font-spec :family "IBM Plex Mono" :weight 'light))
 
 (setq display-line-numbers-type t)
-(setq fancy-splash-image "~/.doom.d/orangutan1.png")
-(setq doom-theme 'doom-dark+)
+(setq fancy-splash-image "~/.doom.d/orangutan.png")
+(setq doom-theme 'doom-dracula)
 (custom-set-faces!
   '(doom-modeline-buffer-modified :foreground "orange"))
 
@@ -29,11 +29,11 @@ Setting up nice user interface.
 ;; (set-frame-parameter (selected-frame) 'alpha '(90 90))
 ;; (add-to-list 'default-frame-alist '(alpha 90 90))
 (windmove-default-keybindings)
-#+END_SRC
+#+end_src
 
 ** Variable Setting
 Setting some values.
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (setq-default
  delete-by-moving-to-trash t
  window-combination-resize t)
@@ -47,9 +47,14 @@ Setting some values.
                (battery))
   (display-battery-mode 1))
 (setq auth-sources '("~/.authinfo"))
-#+END_SRC
+(setq save-interprogram-paste-before-kill nil)
+#+end_src
+** Some Functions
+#+begin_src emacs-lisp
+(map! :ne "M-/" #'comment-or-uncomment-region)
+#+end_src
 ** Which-Key Pop-Up
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (setq which-key-idle-delay 0.5)
 (setq which-key-allow-multiple-replacements t)
 (after! which-key
@@ -58,19 +63,20 @@ Setting some values.
    '(("" . "\\`+?evil[-:]?\\(?:a-\\)?\\(.*\\)") . (nil . "◂\\1"))
    '(("\\`g s" . "\\`evilem--?motion-\\(.*\\)") . (nil . "◃\\1"))
    ))
-#+END_SRC
+#+end_src
 ** ORG-MODE
 Setting todo keywords, org-agenda directories and some keymapping for funcional workspace.
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (after! org
-  (setq org-directory "~/Workshop/BooksAndNotes/org/")
+  (setq org-directory "~/Dropbox/org/")
   (setq org-log-done 'time)
-  (setq org-agenda-files (directory-files-recursively "~/Workshop/BooksAndNotes/org/" "\\.org$"))
+  (setq org-agenda-files (directory-files-recursively "~/Dropbox/org/" "\\.org$"))
   (setq org-todo-keywords
-        '((sequence "TODO" "PROJ" "HOMWRK" "|" "DONE" "CNCL")
-          (sequence "TODAY" "NEXT" "IMPORTANT" "READ")
+        '((sequence "TODO" "|" "DONE" "CNCL")
           (sequence "[ ]" "[-]" "|" "[X]")
           (sequence "LECTURE(l)" "|")
+          (sequence "HOMEWORK" "PROJ" "TASK" "|" "DONE")
+          (sequence "PLAY" "READ" "WATCH" "ONIT" "|" "DONE")
           ))
   (setq org-todo-keyword-faces
         '(("TODO" . "orange")
@@ -78,14 +84,19 @@ Setting todo keywords, org-agenda directories and some keymapping for funcional 
           ("DONE" . "green")
           ("CNCL" . (:foreground "red" :weight bold))
           ("LECTURE" . "purple")
+          ("PLAY" . "pink")
+          ("READ" . "pink")
+          ("WATCH" . "blue")
+          ("ONIT" . "yellow")
           ("[ ]" . "orange")
           ("[-]" . "yellow")
-          ("[X]" . "green")
-          ))
-  (require 'org-bullets)
-  (add-hook 'org-mode-hook (lambda ()
-                             (org-bullets-mode 1)
-                             (prettify-symbols-mode)))
+          ("[X]" . "green")))
+
+  (add-hook 'org-mode-hook (lambda () (prettify-symbols-mode)))
+  (setq org-ellipsis " ↴ "
+        org-tags-column -80
+        org-log-done 'time
+        org-fancy-priorities-list '("⚡" "⬆" "⬇" "☕"))
   (map!
    :map 'org-mode-map
    :localleader
@@ -111,11 +122,11 @@ Setting todo keywords, org-agenda directories and some keymapping for funcional 
 (map! :leader
       (:prefix "b"
        :desc "New empty ORG buffer" "o" #'evil-buffer-org-new))
-#+END_SRC
+#+end_src
 
 Function that inserts image to org file from clipboard.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (defun org-insert-clipboard-image ()
   "Insert screenshot to org file"
   (interactive)
@@ -123,201 +134,255 @@ Function that inserts image to org file from clipboard.
   (let ((filename (concat (format-time-string "%Y_%m_%d_%H%M%S") ".png")))
     (shell-command (concat "cd resources && " "xclip -selection clipboard -t image/png -o > " filename))
     (insert (concat "[[./resources/" filename "]]"))))
-#+END_SRC
+#+end_src
+** Org-Capture
+Capture my notes.
+#+begin_src emacs-lisp
+(setq +org-capture-notes-file "~/Dropbox/org/capture/notes.org"
+      +org-capture-changelog-file "~/Dropbox/org/capture/changelog.org"
+      +org-capture-todo-file "~/Dropbox/org/capture/todo.org"
+      +org-capture-projects-file "~/Dropbox/org/capture/projects.org"
+      +org-capture-journal-file "~/Dropbox/org/capture/journal.org")
+
+(use-package! doct
+  :commands (doct))
+
+(after! org-capture
+  (setq +org-capture-uni-units (condition-case nil
+                                   (split-string (f-read-text "~/.org/.uni-units"))
+                                 (error nil)))
+  (defun +doct-icon-declaration-to-icon (declaration)
+    "Convert :icon declaration to icon"
+    (let ((name (pop declaration))
+          (set  (intern (concat "all-the-icons-" (plist-get declaration :set))))
+          (face (intern (concat "all-the-icons-" (plist-get declaration :color))))
+          (v-adjust (or (plist-get declaration :v-adjust) 0.01)))
+      (apply set `(,name :face ,face :v-adjust ,v-adjust))))
+
+  (defun +doct-iconify-capture-templates (groups)
+    "Add declaration's :icon to each template group in GROUPS."
+    (let ((templates (doct-flatten-lists-in groups)))
+      (setq doct-templates (mapcar (lambda (template)
+                                     (when-let* ((props (nthcdr (if (= (length template) 4) 2 5) template))
+                                                 (spec (plist-get (plist-get props :doct) :icon)))
+                                       (setf (nth 1 template) (concat (+doct-icon-declaration-to-icon spec)
+                                                                      "\t"
+                                                                      (nth 1 template))))
+                                     template)
+                                   templates))))
+  (setq doct-after-conversion-functions '(+doct-iconify-capture-templates))
+  (defun set-org-capture-templates ()
+    (setq org-capture-templates
+          (doct `(("Personal todo" :keys "t"
+                   :icon ("checklist" :set "octicon" :color "green")
+                   :file +org-capture-todo-file
+                   :prepend t
+                   :headline "Inbox"
+                   :type entry
+                   :template ("* TODO %?"
+                              "%i %a")
+                   )
+                  ("Personal note" :keys "n"
+                   :icon ("sticky-note-o" :set "faicon" :color "green")
+                   :file +org-capture-todo-file
+                   :prepend t
+                   :headline "Inbox"
+                   :type entry
+                   :template ("* %?"
+                              "%i %a")
+                   )
+                  ("University" :keys "u"
+                   :icon ("graduation-cap" :set "faicon" :color "purple")
+                   :file +org-capture-todo-file
+                   :headline "University"
+                   :unit-prompt ,(format "%%^{Unit|%s}" (string-join +org-capture-uni-units "|"))
+                   :prepend t
+                   :type entry
+                   :children (("Test" :keys "t"
+                               :icon ("timer" :set "material" :color "red")
+                               :template ("* TODO [#C] %{unit-prompt} %? :uni:tests:"
+                                          "SCHEDULED: %^{Test date:}T"
+                                          "%i %a"))
+                              ("Assignment" :keys "a"
+                               :icon ("library_books" :set "material" :color "orange")
+                               :template ("* TODO [#B] %{unit-prompt} %? :uni:assignments:"
+                                          "DEADLINE: %^{Due date:}T"
+                                          "%i %a"))
+                              ("Lecture" :keys "l"
+                               :icon ("keynote" :set "fileicon" :color "orange")
+                               :template ("* TODO [#C] %{unit-prompt} %? :uni:lecture:"
+                                          "%i %a"))
+                              ("Miscellaneous task" :keys "u"
+                               :icon ("list" :set "faicon" :color "yellow")
+                               :template ("* TODO [#D] %{unit-prompt} %? :uni:"
+                                          "%i %a"))))
+                  ("Interesting" :keys "i"
+                   :icon ("eye" :set "faicon" :color "lcyan")
+                   :file +org-capture-todo-file
+                   :prepend t
+                   :headline "Interesting"
+                   :type entry
+                   :template ("* [ ] %{desc}%? :%{i-type}:"
+                              "%i %a")
+                   :children (("Webpage" :keys "w"
+                               :icon ("globe" :set "faicon" :color "green")
+                               :desc "%(org-cliplink-capture) "
+                               :i-type "read:web"
+                               )
+                              ("Article" :keys "a"
+                               :icon ("file-text" :set "octicon" :color "yellow")
+                               :desc ""
+                               :i-type "read:reaserch"
+                               )
+                              ("Information" :keys "i"
+                               :icon ("info-circle" :set "faicon" :color "blue")
+                               :desc ""
+                               :i-type "read:info"
+                               )
+                              ("Idea" :keys "I"
+                               :icon ("bubble_chart" :set "material" :color "silver")
+                               :desc ""
+                               :i-type "idea"
+                               )))
+                  ("Tasks" :keys "k"
+                   :icon ("inbox" :set "octicon" :color "yellow")
+                   :file +org-capture-todo-file
+                   :prepend t
+                   :headline "Tasks"
+                   :type entry
+                   :template ("* TODO %? %^G%{extra}"
+                              "%i %a")
+                   :children (("General Task" :keys "k"
+                               :icon ("inbox" :set "octicon" :color "yellow")
+                               :extra ""
+                               )
+                              ("Task with deadline" :keys "d"
+                               :icon ("timer" :set "material" :color "orange" :v-adjust -0.1)
+                               :extra "\nDEADLINE: %^{Deadline:}t"
+                               )
+                              ("Scheduled Task" :keys "s"
+                               :icon ("calendar" :set "octicon" :color "orange")
+                               :extra "\nSCHEDULED: %^{Start time:}t"
+                               )
+                              ))
+                  ("Project" :keys "p"
+                   :icon ("repo" :set "octicon" :color "silver")
+                   :prepend t
+                   :type entry
+                   :headline "Inbox"
+                   :template ("* %{time-or-todo} %?"
+                              "%i"
+                              "%a")
+                   :file ""
+                   :custom (:time-or-todo "")
+                   :children (("Project-local todo" :keys "t"
+                               :icon ("checklist" :set "octicon" :color "green")
+                               :time-or-todo "TODO"
+                               :file +org-capture-project-todo-file)
+                              ("Project-local note" :keys "n"
+                               :icon ("sticky-note" :set "faicon" :color "yellow")
+                               :time-or-todo "%U"
+                               :file +org-capture-project-notes-file)
+                              ("Project-local changelog" :keys "c"
+                               :icon ("list" :set "faicon" :color "blue")
+                               :time-or-todo "%U"
+                               :heading "Unreleased"
+                               :file +org-capture-project-changelog-file))
+                   )
+                  ("\tCentralised project templates"
+                   :keys "o"
+                   :type entry
+                   :prepend t
+                   :template ("* %{time-or-todo} %?"
+                              "%i"
+                              "%a")
+                   :children (("Project todo"
+                               :keys "t"
+                               :prepend nil
+                               :time-or-todo "TODO"
+                               :heading "Tasks"
+                               :file +org-capture-central-project-todo-file)
+                              ("Project note"
+                               :keys "n"
+                               :time-or-todo "%U"
+                               :heading "Notes"
+                               :file +org-capture-central-project-notes-file)
+                              ("Project changelog"
+                               :keys "c"
+                               :time-or-todo "%U"
+                               :heading "Unreleased"
+                               :file +org-capture-central-project-changelog-file))
+                   )))))
+
+  (set-org-capture-templates)
+  (unless (display-graphic-p)
+    (add-hook 'server-after-make-frame-hook
+              (defun org-capture-reinitialise-hook ()
+                (when (display-graphic-p)
+                  (set-org-capture-templates)
+                  (remove-hook 'server-after-make-frame-hook
+                               #'org-capture-reinitialise-hook ))))))
+#+end_src
+
 ** Org-Super-Agenda
-#+BEGIN_SRC emacs-lisp
-(after! org-agenda
+Org-agenda but more fancy.
+#+begin_src emacs-lisp
+(setq org-agenda-scheduled-leaders '("" ""))
+(use-package! org-super-agenda
+  :after org-agenda
+  :init
+  (setq org-super-agenda-groups '((:todo "DONE" :log t :order 0)
+                                  (:name "DO IT NOW" :priority "A" :order 1)
+                                  (:name "Lecture" :tag "lecture" :order 2)
+                                  (:name "Due Today" :order 3 :deadline today)
+                                  (:name "Routines" :tag "routine" :order 4)
+                                  (:habit t :order 5)
+                                  (:priority<= "B" :order 10)
+                                  (:name "Fun Activities" :tag "Fun")
+                                  (:auto-parent t :order 20)))
+  :config
   (org-super-agenda-mode))
+#+end_src
+** Dired
 
-(setq org-agenda-skip-scheduled-if-done t
-      org-agenda-skip-deadline-if-done t
-      org-agenda-include-deadlines t
-      org-agenda-block-separator nil
-      org-agenda-tags-column 100
-      org-agenda-compact-blocks t)
-
-(setq org-agenda-custom-commands
-      '(("o" "Overview"
-         ((agenda "" ((org-agenda-span 'day)
-                      (org-super-agenda-groups
-                       '((:name "Today"
-                          :time-grid t
-                          :date today
-                          :todo "TODAY"
-                          :scheduled today
-                          :order 1)))))
-          (alltodo "" ((org-agenda-overriding-header "")
-                       (org-super-agenda-groups
-                        '((:name "Next to do"
-                           :todo "NEXT"
-                           :order 1)
-                          (:name "Important"
-                           :tag "IMPORTANT"
-                           :priority "A"
-                           :order 6)
-                          (:name "Due Today"
-                           :deadline today
-                           :order 2)
-                          (:name "Due Soon"
-                           :deadline future
-                           :order 8)
-                          (:name "Overdue"
-                           :deadline past
-                           :face error
-                           :order 7)
-                          (:name "Assignments"
-                           :tag "HOMWRK"
-                           :order 10)
-                          (:name "Projects"
-                           :tag "PROJ"
-                           :order 14)
-                          (:name "To read"
-                           :tag "Read"
-                           :order 15)))))))))
-#+END_SRC
+#+begin_src emacs-lisp
+(use-package! dired
+  :commands (dired dired-jump)
+  :bind (("C-x C-j" . dired-jump))
+  :config
+  (evil-collection-define-key 'normal 'dired-mode-map
+    "h" 'dired-up-directory
+    "l" 'dired-find-file))
+#+end_src
 ** Window Keybinding
 I wasn't comfortable with splitting windows with Ctrl commands.
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (map! :leader :desc "find-file-other-window" "d" #'find-file-other-window)
-#+END_SRC
-
+#+end_src
 ** Clang Support
 Giving my clang formatter file to emacs and setting a keybinding.
-#+BEGIN_SRC emacs-lisp
-(load "/usr/share/clang/clang-format.el")
-(global-set-key [C-M-tab] 'clang-format-region)
-#+END_SRC
+#+begin_src emacs-lisp
+                                        ;(load "/usr/share/clang/clang-format.el")
+                                        ;(global-set-key [C-M-tab] 'clang-format-region)
+#+end_src
 
 ** Flutter and Dart Setup
 #+begin_src emacs-lisp
 (after! lsp-dart
   (setq lsp-dart-sdk-dir "/home/penguin/Documents/flutter/bin/cache/dart-sdk/")
   (setq flutter-sdk-path "/home/penguin/Documents/flutter/")
-  (setq lsp-dart-flutter-sdk-dir "/home/penguin/Documents/flutter/"))
+  (setq lsp-dart-flutter-sdk-dir "/home/penguin/Documents/flutter/")
+  (setq dart-format-on-save t))
 #+end_src
-
-** Treemacs Configuration
-Changing and adding some icons to the treemacs configuration.
-#+BEGIN_SRC emacs-lisp
-(after! treemacs
-  (treemacs-modify-theme "Default"
-                         :icon-directory (f-join treemacs-dir "icons/default/vsc")
-                         :config
-                         (progn
-                           (treemacs-create-icon :file "cmake.png"  :extensions ("cmakecache.txt"))
-                           (treemacs-create-icon :file "cmake.png"  :extensions ("cmakelists.txt"))))
-  (treemacs-create-icon :file "txt.png"  :extensions ("txt"))
-  (setq doom-themes-treemacs-theme "Default"))
-#+END_SRC
-
-** Discord Support for Gamers
-My Elcord package configuration with personal discord app to rich presence.
-#+BEGIN_SRC emacs-lisp
-(require 'elcord)
-(after! elcord
-  (setq  elcord-client-id "776170979415031819"
-         elcord-use-major-mode-as-main-icon t
-         elcord--editor-icon "emacs_icon")
-  (push '(dart-mode . "dart-mode_icon") elcord-mode-icon-alist)
-  (push '("Org-Agenda" . "org-mode_icon") elcord-mode-icon-alist)
-  (push '("pdf-view" . "pdf-mode_icon") elcord-mode-icon-alist))
-#+END_SRC
-
-** EWW
-EWW is the Emacs Web Wowser, the builtin browser in Emacs. SPC-e was available for this job.
-#+BEGIN_SRC emacs-lisp
-(setq browse-url-browser-function 'eww-browse-url)
-(map! :leader
-      :desc "Eww web browser"
-      "e w" #'eww
-      :leader
-      :desc "Eww reload page"
-      "e R" #'eww-reload
-      :leader
-      :desc "Search web for text between BEG/END"
-      "s w" #'eww-search-words)
-#+END_SRC
-
-** EXWM
-EXWM is Emacs based window manager.There is DistroTube configuration with small changes in case urge of WM hopping .d.
-#+BEGIN_SRC emacs-lisp
-(require 'exwm)
-(require 'exwm-config)
-(require 'exwm-systemtray)
-(exwm-systemtray-enable)
-(require 'exwm-randr)
-(exwm-randr-enable)
-(add-hook 'exwm-randr-screen-change-hook
-          (lambda ()
-            (start-process-shell-command
-             "xrandr" nil "xrandr --output eDPI1 --mode 1920x1080 --pos 0x0 --rotate normal")))
-(setq exwm-workspace-number 10
-      exwm-randr-workspace-output-plist '(0 "eDPI1")
-      exwm-input-prefix-keys '(?\M-x ?\M-:)
-      exwm-input-simulation-keys '(([?\s-F] . [?\C-f]))
-      exwm-input-global-keys '(([?\s-&] . (lambda (command)
-                                            (interactive (list (read-shell-command "$ ")))
-                                            (start-process-shell-command command nil command)))
-                               ;; splits
-                               ([?\s-v] . evil-window-vsplit)
-                               ([?\s-z] . evil-window-split)
-                               ;; managing workspaces
-                               ([?\s-w] . exwm-workspace-switch)
-                               ([?\s-W] . exwm-workspace-swap)
-                               ([?\s-\C-w] . exwm-workspace-move)
-                               ;; essential programs
-                               ([?\s-d] . dired)
-                               ([s-return] . eshell)
-                               ([s-S-return] . dmenu)
-                               ;; killing buffers and windows
-                               ([?\s-b] . ibuffer)
-                               ([?\s-B] . kill-current-buffer)
-                               ([?\s-c] . +workspace/close-window-or-workspace)
-                               ;; change window focus with super+h,j,k,l
-                               ([?\s-h] . evil-window-left)
-                               ([?\s-j] . evil-window-next)
-                               ([?\s-k] . evil-window-prev)
-                               ([?\s-l] . evil-window-right)
-                               ;; move windows around using SUPER+SHIFT+h,j,k,l
-                               ([?\s-H] . +evil/window-move-left)
-                               ([?\s-J] . +evil/window-move-down)
-                               ([?\s-K] . +evil/window-move-up)
-                               ([?\s-L] . +evil/window-move-right)
-                               ;; move window to far left or far right with SUPER+CTRL+h,l
-                               ([?\s-\C-h] . side-left-window)
-                               ([?\s-\C-j] . side-bottom-window)
-                               ([?\s-\C-l] . side-right-window)
-                               ([?\s-\C-d] . side-window-delete-all)
-                               ([?\s-\C-r] . resize-window)
-                               ;; switch workspace with SUPER+{0-9}
-                               ([?\s-0] . (lambda () (interactive) (exwm-workspace-switch-create 0)))
-                               ([?\s-1] . (lambda () (interactive) (exwm-workspace-switch-create 1)))
-                               ([?\s-2] . (lambda () (interactive) (exwm-workspace-switch-create 2)))
-                               ([?\s-3] . (lambda () (interactive) (exwm-workspace-switch-create 3)))
-                               ([?\s-4] . (lambda () (interactive) (exwm-workspace-switch-create 4)))
-                               ([?\s-5] . (lambda () (interactive) (exwm-workspace-switch-create 5)))
-                               ([?\s-6] . (lambda () (interactive) (exwm-workspace-switch-create 6)))
-                               ([?\s-7] . (lambda () (interactive) (exwm-workspace-switch-create 7)))
-                               ([?\s-8] . (lambda () (interactive) (exwm-workspace-switch-create 8)))
-                               ([?\s-9] . (lambda () (interactive) (exwm-workspace-switch-create 9)))
-                               ;; move window workspace with SUPER+SHIFT+{0-9}
-                               ([?\s-\)] . (lambda () (interactive) (exwm-workspace-move-window 0)))
-                               ([?\s-!] . (lambda () (interactive) (exwm-workspace-move-window 1)))
-                               ([?\s-@] . (lambda () (interactive) (exwm-workspace-move-window 2)))
-                               ([?\s-#] . (lambda () (interactive) (exwm-workspace-move-window 3)))
-                               ([?\s-$] . (lambda () (interactive) (exwm-workspace-move-window 4)))
-                               ([?\s-%] . (lambda () (interactive) (exwm-workspace-move-window 5)))
-                               ([?\s-^] . (lambda () (interactive) (exwm-workspace-move-window 6)))
-                               ([?\s-&] . (lambda () (interactive) (exwm-workspace-move-window 7)))
-                               ([?\s-*] . (lambda () (interactive) (exwm-workspace-move-window 8)))
-                               ([?\s-\(] . (lambda () (interactive) (exwm-workspace-move-window 9)))
-                               ;; setting some toggle commands
-                               ([?\s-f] . exwm-floating-toggle-floating)
-                               ([?\s-m] . exwm-layout-toggle-mode-line)
-                               ([f11] . exwm-layout-toggle-fullscreen)))
-#+END_SRC
 
 ** Latex Config
 #+begin_src emacs-lisp
 (setq TeX-auto-untabify 't)
+#+end_src
+** Org-gamedb
+#+begin_src emacs-lisp
+(use-package! org-gamedb
+  :defer t
+  :config
+  (setq org-gamedb-api-key "224983015bb67d4c49074fe795150b9be8addf04"))
 #+end_src
