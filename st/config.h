@@ -108,34 +108,60 @@ char *termname = "st-256color";
 unsigned int tabspaces = 8;
 
 /* bg opacity */
-float alpha = 0.8;
+float alpha = 0.9;
 
 /* Terminal colors (16 first used in escape sequence) */
-static const char *colorname[] = {
-    "#000000", "#ff5555", "#50fa7b", "#f1fa8c", "#bd93f9", "#ff79c6",
-    "#1793d1", "#bbbbbb", "#44475a", "#ff5555", "#50fa7b", "#f1fa8c",
-    "#bd93f9", "#ff79c6", "#1793d1", "#ffffff", [255] = 0,
+const char *colorname[] = {
 
-    "#add8e6", "#555555", "#282a36", "#f8f8f2",
+    /* 8 normal colors */
+    [0] = "#282828", /* black  / hard contrast: #1d2021 / soft contrast: #32302f
+                      */
+    [1] = "#cc241d", /* red     */
+    [2] = "#98971a", /* green   */
+    [3] = "#d79921", /* yellow  / orange = "#d65d0e" */
+    [4] = "#458588", /* blue    */
+    [5] = "#b16286", /* magenta */
+    [6] = "#689d6a", /* cyan    */
+    [7] = "#a89984", /* white   */
+
+    /* 8 bright colors */
+    [8] = "#928374",  /* black   */
+    [9] = "#fb4934",  /* red     */
+    [10] = "#b8bb26", /* green   */
+    [11] = "#fabd2f", /* yellow  / orange = "#fe8019" */
+    [12] = "#83a598", /* blue    */
+    [13] = "#d3869b", /* magenta */
+    [14] = "#8ec07c", /* cyan    */
+    [15] = "#ebdbb2", /* white   */
+
+    /* special colors */
+    [256] = "#282828", /* background */
+    [257] = "#a89984", /* foreground */
+    [258] = "#ebdbb2", /* cursor */
 };
 
-/*
- * Default colors (colorname index)
- * foreground, background, cursor, reverse cursor
- */
-unsigned int defaultfg = 259;
-unsigned int defaultbg = 258;
-unsigned int defaultcs = 256;
-unsigned int defaultrcs = 257;
+/* Default colors (colorname index)
+ * foreground, background, cursor */
+unsigned int defaultbg = 0;
+unsigned int defaultfg = 257;
+unsigned int defaultcs = 258;
+unsigned int defaultrcs = 258;
 
 /*
- * Default shape of cursor
- * 2: Block ("█")
- * 4: Underline ("_")
- * 6: Bar ("|")
- * 7: Snowman ("☃")
+ * https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h4-Functions-using-CSI-_-ordered-by-the-final-character-lparen-s-rparen:CSI-Ps-SP-q.1D81
+ * Default style of cursor
+ * 0: Blinking block
+ * 1: Blinking block (default)
+ * 2: Steady block ("█")
+ * 3: Blinking underline
+ * 4: Steady underline ("_")
+ * 5: Blinking bar
+ * 6: Steady bar ("|")
+ * 7: Blinking st cursor
+ * 8: Steady st cursor
  */
-static unsigned int cursorshape = 2;
+static unsigned int cursorstyle = 5;
+static Rune stcursor = 0x2603; /* snowman (U+2603) */
 
 /*
  * Default columns and rows numbers
