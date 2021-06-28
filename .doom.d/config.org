@@ -1,6 +1,6 @@
 #+TITLE: Doom Emacs Config
 #+AUTHOR: realsontaran
-#+STARTUP: showeverything
+#+STARTUP: content
 #+PROPERTY: header-args :tangle config.el
 
 * My Doom Emacs Config
@@ -10,9 +10,8 @@
       user-mail-address "therealsontaran@protonmailcom")
 #+end_src
 
-** Font, Theme and Splash Screen
+** Font, Theme
 Setting up nice user interface.
-
 #+begin_src emacs-lisp
 (setq doom-font (font-spec :family "JetBrains Mono" :size 14)
       doom-big-font (font-spec :family "JetBrains Mono" :size 20)
@@ -20,8 +19,8 @@ Setting up nice user interface.
       doom-serif-font (font-spec :family "IBM Plex Mono" :weight 'light))
 
 (setq display-line-numbers-type t)
+(setq doom-theme 'zaiste)
 (setq fancy-splash-image "~/.doom.d/orangutan.png")
-(setq doom-theme 'doom-dracula)
 (custom-set-faces!
   '(doom-modeline-buffer-modified :foreground "orange"))
 
@@ -30,10 +29,26 @@ Setting up nice user interface.
 ;; (add-to-list 'default-frame-alist '(alpha 90 90))
 (windmove-default-keybindings)
 #+end_src
+** Change Theme
+#+begin_src emacs-lisp
+;; (defun synchronize-theme ()
+;;   (let* ((light-theme 'modus-operandi)
+;;          (dark-theme 'modus-vivendi)
+;;          (start-time-light-theme 6)
+;;          (end-time-light-theme 17)
+;;          (hour (string-to-number (substring (current-time-string) 11 13)))
+;;          (next-theme (if (member hour (number-sequence start-time-light-theme end-time-light-theme))
+;;                          light-theme dark-theme)))
+;;     (when (not (equal doom-theme next-theme))
+;;       (setq doom-theme next-theme)
+;;       (load-theme next-theme))))
 
+;; (run-with-timer 0 900 'synchronize-theme)
+#+end_src
 ** Variable Setting
 Setting some values.
 #+begin_src emacs-lisp
+(setq shell-file-name "/bin/zsh")
 (setq-default
  delete-by-moving-to-trash t
  window-combination-resize t)
@@ -51,7 +66,22 @@ Setting some values.
 #+end_src
 ** Some Functions
 #+begin_src emacs-lisp
-(map! :ne "M-/" #'comment-or-uncomment-region)
+(map! :leader
+      :desc "Org-Pomodoro"
+      "v" #'org-pomodoro)
+(map! :ne "M-/" #'comment-line)
+(map! :ne "M-n" #'man)
+(map! :leader
+      :desc "Dired Jump"
+      "[" #'dired-jump)
+(map! :leader
+      :desc "Org-Roam Insert"
+      "r" #'org-roam-capture)
+
+#+end_src
+** Treemacs
+#+begin_src emacs-lisp
+(remove-hook 'doom-load-theme-hook #'doom-themes-treemacs-config)
 #+end_src
 ** Which-Key Pop-Up
 #+begin_src emacs-lisp
@@ -67,7 +97,14 @@ Setting some values.
 ** ORG-MODE
 Setting todo keywords, org-agenda directories and some keymapping for funcional workspace.
 #+begin_src emacs-lisp
+(require 'org-bullets)
+(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 (after! org
+  (setq org-bullets-bullet-list '("●" "⎉" "⁘" "⁙" "⁜"))
+  (setq org-priority-faces '((65 :foreground "#e45649")
+                        (66 :foreground "#da8548")
+                        (67 :foreground "#0098dd")))
+
   (setq org-directory "~/Dropbox/org/")
   (setq org-log-done 'time)
   (setq org-agenda-files (directory-files-recursively "~/Dropbox/org/" "\\.org$"))
@@ -100,14 +137,8 @@ Setting todo keywords, org-agenda directories and some keymapping for funcional 
   (map!
    :map 'org-mode-map
    :localleader
-   :ni "U" #'org-latex-preview)
-
-  (map!
-   :map 'org-mode-map
-   :localleader
-   :ni "v" #'org-insert-clipboard-image))
-
-;; Create new Org buffer.
+   :ni "v" #'org-insert-clipboard-image ))
+  ;; Create new Org buffer.
 (evil-define-command evil-buffer-org-new (count file)
   "Creates a new ORG buffer replacing the current window, optionally
    editing a certain FILE"
@@ -134,6 +165,17 @@ Function that inserts image to org file from clipboard.
   (let ((filename (concat (format-time-string "%Y_%m_%d_%H%M%S") ".png")))
     (shell-command (concat "cd resources && " "xclip -selection clipboard -t image/png -o > " filename))
     (insert (concat "[[./resources/" filename "]]"))))
+#+end_src
+
+#+begin_src emacs-lisp
+(defun my/modify-org-done-face ()
+  (setq org-fontify-done-headline t)
+  (set-face-attribute 'org-done nil :strike-through t)
+  (set-face-attribute 'org-headline-done nil
+                      :strike-through t
+                      :foreground "light gray"))
+(eval-after-load "org"
+  (add-hook 'org-add-hook 'my/modify-org-done-face))
 #+end_src
 ** Org-Capture
 Capture my notes.
@@ -171,9 +213,43 @@ Capture my notes.
                                      template)
                                    templates))))
   (setq doct-after-conversion-functions '(+doct-iconify-capture-templates))
-  (defun set-org-capture-templates ()
+
+  #+end_src
+
+  #+begin_src emacs-lisp
+(defun transform-square-brackets-to-round-ones(string-to-transform)
+  "Transforms [ into ( and ] into ), other chars left unchanged."
+  (concat
+   (mapcar #'(lambda (c) (if (equal c ?[) ?\( (if (equal c ?]) ?\) c))) string-to-transform))
+  )
+  #+end_src
+
+  #+begin_src emacs-lisp
+ (defun set-org-capture-templates ()
     (setq org-capture-templates
-          (doct `(("Personal todo" :keys "t"
+          (doct `(
+                  ("Protocol" :keys "p"
+                   :file +org-capture-todo-file
+                   :prepend t
+                   :headline "Pocket Inbox"
+                   :type entry
+                   :template ("* TODO %(transform-square-brackets-to-round-ones\"%:description\")"
+                              "Source: [[%:link][link]]"
+                              "Captured On: %U"
+                              "#+BEGIN_QUOTE"
+                              "%i"
+                              "#+END_QUOTE" "%?")
+                   )
+                  ("Protocol Link" :keys "L"
+                   :file +org-capture-todo-file
+                   :prepend t
+                   :headline "Pocket Inbox"
+                   :type entry
+                   :template ("* TODO [[%:link][%(transform-square-brackets-to-round-ones\"%:description\")]]"
+                              "Captured On: %U"
+                              "%?")
+                   )
+                  ("Personal todo" :keys "t"
                    :icon ("checklist" :set "octicon" :color "green")
                    :file +org-capture-todo-file
                    :prepend t
@@ -264,55 +340,7 @@ Capture my notes.
                                :icon ("calendar" :set "octicon" :color "orange")
                                :extra "\nSCHEDULED: %^{Start time:}t"
                                )
-                              ))
-                  ("Project" :keys "p"
-                   :icon ("repo" :set "octicon" :color "silver")
-                   :prepend t
-                   :type entry
-                   :headline "Inbox"
-                   :template ("* %{time-or-todo} %?"
-                              "%i"
-                              "%a")
-                   :file ""
-                   :custom (:time-or-todo "")
-                   :children (("Project-local todo" :keys "t"
-                               :icon ("checklist" :set "octicon" :color "green")
-                               :time-or-todo "TODO"
-                               :file +org-capture-project-todo-file)
-                              ("Project-local note" :keys "n"
-                               :icon ("sticky-note" :set "faicon" :color "yellow")
-                               :time-or-todo "%U"
-                               :file +org-capture-project-notes-file)
-                              ("Project-local changelog" :keys "c"
-                               :icon ("list" :set "faicon" :color "blue")
-                               :time-or-todo "%U"
-                               :heading "Unreleased"
-                               :file +org-capture-project-changelog-file))
-                   )
-                  ("\tCentralised project templates"
-                   :keys "o"
-                   :type entry
-                   :prepend t
-                   :template ("* %{time-or-todo} %?"
-                              "%i"
-                              "%a")
-                   :children (("Project todo"
-                               :keys "t"
-                               :prepend nil
-                               :time-or-todo "TODO"
-                               :heading "Tasks"
-                               :file +org-capture-central-project-todo-file)
-                              ("Project note"
-                               :keys "n"
-                               :time-or-todo "%U"
-                               :heading "Notes"
-                               :file +org-capture-central-project-notes-file)
-                              ("Project changelog"
-                               :keys "c"
-                               :time-or-todo "%U"
-                               :heading "Unreleased"
-                               :file +org-capture-central-project-changelog-file))
-                   )))))
+                              ))))))
 
   (set-org-capture-templates)
   (unless (display-graphic-p)
@@ -324,22 +352,91 @@ Capture my notes.
                                #'org-capture-reinitialise-hook ))))))
 #+end_src
 
+#+RESULTS:
+
 ** Org-Super-Agenda
 Org-agenda but more fancy.
 #+begin_src emacs-lisp
-(setq org-agenda-scheduled-leaders '("" ""))
+(map! :leader
+      :desc "Org Agenda"
+      "a" #'org-agenda-list)
+#+end_src
+
+#+begin_src emacs-lisp
+(setq org-agenda-scheduled-leaders '("" "")
+      org-agenda-skip-scheduled-if-done t
+      org-agenda-skip-deadline-if-done t
+      org-agenda-include-deadlines t
+      org-agenda-block-separator nil
+      org-agenda-tags-column 100
+      org-agenda-compact-blocks t)
+
 (use-package! org-super-agenda
   :after org-agenda
   :init
-  (setq org-super-agenda-groups '((:todo "DONE" :log t :order 0)
-                                  (:name "DO IT NOW" :priority "A" :order 1)
-                                  (:name "Lecture" :tag "lecture" :order 2)
-                                  (:name "Due Today" :order 3 :deadline today)
-                                  (:name "Routines" :tag "routine" :order 4)
-                                  (:habit t :order 5)
-                                  (:priority<= "B" :order 10)
-                                  (:name "Fun Activities" :tag "Fun")
-                                  (:auto-parent t :order 20)))
+  (setq org-super-agenda-groups
+        '((:name "Routine and Chores"
+           :tag "routine"
+           :order 1)
+          (:name "Due Today"
+           :deadline today
+           :order 2)
+          (:name "Important"
+           :priority "A"
+           :order 3)
+          (:name "Lectures"
+           :todo "LECTURE"
+           :order 4)
+          (:name "Overdue"
+           :deadline past
+           :face error
+           :order 7)
+          (:name "Assignments"
+           :tag ":uni:assignments:"
+           :todo "HOMEWORK"
+           :order 10)
+          (:name "Projects"
+           :tag "idea"
+           :order 14)
+          (:name "To Read/Watch"
+           :todo ("READ" "WATCH")
+           :order 30)))
+  (setq org-agenda-custom-commands
+        '(("o" "Overview"
+           ((agenda "" ((org-agenda-span 'day)
+                        (org-super-agenda-groups
+                         '((:name "Today"
+                            :time-grid t
+                            :date today
+                            :scheduled today
+                            :order 1)))))
+            (alltodo "" ((org-agenda-overriding-header "")
+                         (org-super-agenda-groups
+                          '((:name "Routine and Chores"
+                             :tag "routine"
+                             :order 1)
+                            (:name "Due Today"
+                             :deadline today
+                             :order 2)
+                            (:name "Important"
+                             :priority "A"
+                             :order 3)
+                            (:name "Lectures"
+                             :todo "LECTURE"
+                             :order 4)
+                            (:name "Overdue"
+                             :deadline past
+                             :face error
+                             :order 7)
+                            (:name "Assignments"
+                             :tag "HOMEWORK"
+                             :order 10)
+                            (:name "Projects"
+                             :tag "idea"
+                             :order 14)
+                            (:name "To Read/Watch"
+                             :todo ("READ" "WATCH")
+                             :order 30)))))))))
   :config
   (org-super-agenda-mode))
 #+end_src
@@ -354,16 +451,32 @@ Org-agenda but more fancy.
     "h" 'dired-up-directory
     "l" 'dired-find-file))
 #+end_src
-** Window Keybinding
+** Window Management
 I wasn't comfortable with splitting windows with Ctrl commands.
 #+begin_src emacs-lisp
 (map! :leader :desc "find-file-other-window" "d" #'find-file-other-window)
 #+end_src
+
 ** Clang Support
 Giving my clang formatter file to emacs and setting a keybinding.
 #+begin_src emacs-lisp
-                                        ;(load "/usr/share/clang/clang-format.el")
-                                        ;(global-set-key [C-M-tab] 'clang-format-region)
+(load "/usr/share/clang/clang-format.el")
+(global-set-key [C-M-tab] 'clang-format-region)
+#+end_src
+** Srefactor
+#+begin_src emacs-lisp
+(require 'srefactor)
+(require 'srefactor-lisp)
+
+;; OPTIONAL: ADD IT ONLY IF YOU USE C/C++.
+(semantic-mode 1) ;; -> this is optional for Lisp
+
+(define-key c-mode-map (kbd "M-RET") 'srefactor-refactor-at-point)
+(define-key c++-mode-map (kbd "M-RET") 'srefactor-refactor-at-point)
+(global-set-key (kbd "M-RET o") 'srefactor-lisp-one-line)
+(global-set-key (kbd "M-RET m") 'srefactor-lisp-format-sexp)
+(global-set-key (kbd "M-RET d") 'srefactor-lisp-format-defun)
+(global-set-key (kbd "M-RET b") 'srefactor-lisp-format-buffer)
 #+end_src
 
 ** Flutter and Dart Setup
@@ -379,10 +492,45 @@ Giving my clang formatter file to emacs and setting a keybinding.
 #+begin_src emacs-lisp
 (setq TeX-auto-untabify 't)
 #+end_src
+** MIPS Formatter
+#+begin_src emacs-lisp
+(defun asm-mode-setup ()
+  (set (make-local-variable 'gofmt-command) "asmfmt")
+  (add-hook 'before-save-hook 'gofmt nil t)
+)
+
+(add-hook 'asm-mode-hook 'asm-mode-setup)
+#+end_src
 ** Org-gamedb
 #+begin_src emacs-lisp
 (use-package! org-gamedb
   :defer t
   :config
   (setq org-gamedb-api-key "224983015bb67d4c49074fe795150b9be8addf04"))
+#+end_src
+** Org-Roam
+#+begin_src emacs-lisp
+(setq org-roam-directory "~/Dropbox/org/roam")
+(server-start)
+(require 'org-protocol)
+#+end_src
+** Org-Pomodoro
+#+begin_src emacs-lisp
+(setq org-pomodoro-finished-sound "/home/penguin/Documents/openup.wav")
+(setq org-pomodoro-short-break-sound "/home/penguin/.emacs.d/.local/straight/build-27.2/org-pomodoro/resources/ticking.wav")
+(setq org-pomodoro-long-break-sound-p nil)
+(setq org-pomodoro-overtime-sound-p nil)
+#+end_src
+** Epub
+#+begin_src emacs-lisp
+(add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
+#+end_src
+** Org-media
+#+begin_src emacs-lisp :tangle yes
+(use-package! org-media-note
+  :hook (org-mode .  org-media-note-mode)
+  :bind (
+         ("H-v" . org-media-note-hydra/body))  ;; Main entrance
+  :config
+  (setq org-media-note-screenshot-image-dir "~/Pictures/"))
 #+end_src
